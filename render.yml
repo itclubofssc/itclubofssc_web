@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: it-club-portal
+    env: python
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    healthCheckPath: /home
+    autoDeploy: true

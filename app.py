@@ -12,7 +12,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
-app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24))
+app.secret_key = os.environ.get('SECRET_KEY', os.urandom(32))
 
 app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')  # used to build URL path (e.g. /static/uploads/...)
 app.config['UPLOAD_PATH'] = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])  # absolute filesystem path
@@ -195,6 +195,10 @@ def init_db():
     db.commit()
     db.close()
 
+def ensure_instance_path():
+    if not os.path.exists(app.instance_path):
+        os.makedirs(app.instance_path)
+        
 def admin_required(f):
     @functools.wraps(f)
     def decorated(*args, **kwargs):
@@ -1430,7 +1434,7 @@ def internal_error(error):
     return render_template('error/500.html'), 500
 
 
-
+ensure_instance_path()
 if __name__ == "__main__":
     init_db()
-    app.run(debug=True, port=3000, host='0.0.0.0')
+    app.run(debug=False, port=3000, host='0.0.0.0')
