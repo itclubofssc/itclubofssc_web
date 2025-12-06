@@ -1,0 +1,19 @@
+# Flask Framework
+Flask==3.0.0
+Werkzeug==3.0.1
+Jinja2==3.1.2
+itsdangerous==2.1.2
+
+# Database
+sqlite3
+
+bcrypt==4.0.1
+
+# File Upload Handling
+python-dotenv==1.0.0
+
+# Development & Testing
+pytest==7.4.3
+pytest-flask==1.2.0
+
+gunicorn==21.2.0
