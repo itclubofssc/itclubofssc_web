@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - IT Club</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand solid" href="/home">
+            <i class="fas fa-code me-2"></i>
+            <span class="brand-text glow-text">IT CLUB</span>
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item mx-2">
+                    <a class="nav-link nav-link-custom" href="/home">
+                        <i class="fas fa-home me-1"></i>
+                        Home
+                    </a>
+                </li>
+                
+                <li class="nav-item mx-2">
+                    <a class="nav-link nav-link-custom" href="#about">
+                        <i class="fas fa-info-circle me-1"></i>
+                        About
+                    </a>
+                </li>
+                
+                <li class="nav-item mx-2">
+                    <a class="nav-link nav-link-custom" href="#announcements">
+                        <i class="fas fa-bullhorn me-1"></i>
+                        Announcements
+                    </a>
+                </li>
+                
+                <li class="nav-item ms-3">
+                    <a class="btn btn-login" href="/login">
+                        <i class="fas fa-sign-in-alt me-2"></i>
+                        Member Login
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+    <!-- Login Page -->
+    <div class="login-page">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 col-md-8">
+                    <div class="login-container">
+                        <div class="login-header">
+                            <div class="login-icon">
+                                <i class="fas fa-sign-in-alt"></i>
+                            </div>
+                            <h1 class="login-title">Member Login</h1>
+                            <p class="login-subtitle">Access your IT Club dashboard and resources</p>
+                        </div>
+                        
+                        <!-- Flash Messages -->
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {% if category == 'success' %}
+                                            <i class="fas fa-check-circle me-2"></i>
+                                        {% elif category == 'error' or category == 'danger' %}
+                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                        {% else %}
+                                            <i class="fas fa-info-circle me-2"></i>
+                                        {% endif %}
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        
+                        <!-- Login Form -->
+                        <form method="POST" action="{{ url_for('login') }}" id="loginForm">
+                            <div class="mb-4">
+                                <label for="email" class="form-label">
+                                    <i class="fas fa-envelope me-2"></i>Email Address
+                                </label>
+                                <input type="email" 
+                                       class="form-control" 
+                                       id="email" 
+                                       name="email" 
+                                       placeholder="member@itclub.edu"
+                                       required>
+                                <div class="invalid-feedback">
+                                    Please enter a valid email address
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="password" class="form-label">
+                                    <i class="fas fa-lock me-2"></i>Password
+                                </label>
+                                <div class="input-group">
+                                    <input type="password" 
+                                           class="form-control" 
+                                           id="password" 
+                                           name="password" 
+                                           placeholder="Enter your password"
+                                           required
+                                           minlength="6">
+                                    <span class="input-group-text" id="togglePassword">
+                                        <i class="fas fa-eye" id="toggleIcon"></i>
+                                    </span>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Password must be at least 6 characters
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="login-btn" id="loginButton">
+                                    <i class="fas fa-sign-in-alt me-2"></i>
+                                    <span>Login to Dashboard</span>
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <div class="login-links">
+                            <p>Need help logging in? Contact club administrator</p>
+                            <a href="/home" class="login-link">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Homepage
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Decorative Terminal Code -->
+                    <div class="terminal-code">
+                        &lt;login&gt; auth:member access:granted redirect:/dashboard &lt;/login&gt;
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+  <script>
+    // Toggle password visibility
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize elements safely
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('toggleIcon');
+        
+        // Only run toggle functionality if elements exist
+        if (togglePassword && passwordInput && toggleIcon) {
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Toggle icon safely
+                if (toggleIcon.classList.contains('fa-eye')) {
+                    toggleIcon.classList.remove('fa-eye');
+                    toggleIcon.classList.add('fa-eye-slash');
+                } else {
+                    toggleIcon.classList.remove('fa-eye-slash');
+                    toggleIcon.classList.add('fa-eye');
+                }
+            });
+        }
+        
+        // Form validation - only initialize if form exists
+        const form = document.getElementById('loginForm');
+        if (form) {
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const loginButton = document.getElementById('loginButton');
+            
+            // Real-time email validation
+            if (emailInput) {
+                emailInput.addEventListener('input', function() {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (emailRegex.test(this.value.trim())) {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    } else if (this.value.trim() === '') {
+                        this.classList.remove('is-invalid');
+                        this.classList.remove('is-valid');
+                    } else {
+                        this.classList.remove('is-valid');
+                        this.classList.add('is-invalid');
+                    }
+                });
+            }
+            
+            // Real-time password validation
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function() {
+                    if (this.value.length >= 6) {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    } else if (this.value.length === 0) {
+                        this.classList.remove('is-invalid');
+                        this.classList.remove('is-valid');
+                    } else {
+                        this.classList.remove('is-valid');
+                        this.classList.add('is-invalid');
+                    }
+                });
+            }
+            
+            // Form submission handler
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent immediate submission for validation
+                
+                let isValid = true;
+                const errors = [];
+                
+                // Email validation
+                if (emailInput) {
+                    const email = emailInput.value.trim();
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    
+                    if (!email) {
+                        emailInput.classList.add('is-invalid');
+                        errors.push('Email is required');
+                        isValid = false;
+                    } else if (!emailRegex.test(email)) {
+                        emailInput.classList.add('is-invalid');
+                        errors.push('Please enter a valid email address');
+                        isValid = false;
+                    } else {
+                        emailInput.classList.remove('is-invalid');
+                        emailInput.classList.add('is-valid');
+                    }
+                }
+                
+                // Password validation
+                if (passwordInput) {
+                    const password = passwordInput.value;
+                    
+                    if (!password) {
+                        passwordInput.classList.add('is-invalid');
+                        errors.push('Password is required');
+                        isValid = false;
+                    } else if (password.length < 6) {
+                        passwordInput.classList.add('is-invalid');
+                        errors.push('Password must be at least 6 characters');
+                        isValid = false;
+                    } else {
+                        passwordInput.classList.remove('is-invalid');
+                        passwordInput.classList.add('is-valid');
+                    }
+                }
+                
+                if (!isValid) {
+                    // Remove existing error alerts
+                    const existingAlerts = form.querySelectorAll('.alert.alert-danger');
+                    existingAlerts.forEach(alert => alert.remove());
+                    
+                    // Show error message
+                    if (errors.length > 0) {
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                        alertDiv.innerHTML = `
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            ${errors.join('. ')}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        `;
+                        form.insertBefore(alertDiv, form.firstChild);
+                        
+                        // Auto-remove after 5 seconds
+                        setTimeout(() => {
+                            if (alertDiv.parentNode) {
+                                const bsAlert = bootstrap.Alert.getInstance(alertDiv);
+                                if (bsAlert) {
+                                    bsAlert.close();
+                                } else {
+                                    alertDiv.remove();
+                                }
+                            }
+                        }, 5000);
+                    }
+                } else {
+                    // Show loading state if button exists
+                    if (loginButton) {
+                        const originalHTML = loginButton.innerHTML;
+                        loginButton.innerHTML = `
+                            <div class="loading-spinner"></div>
+                            <span>Authenticating...</span>
+                        `;
+                        loginButton.disabled = true;
+                        
+                        // Store original state for reset
+                        loginButton.dataset.originalHTML = originalHTML;
+                    }
+                    
+                    // Remove existing alerts
+                    const existingAlerts = form.querySelectorAll('.alert');
+                    existingAlerts.forEach(alert => {
+                        const bsAlert = bootstrap.Alert.getInstance(alert);
+                        if (bsAlert) {
+                            bsAlert.close();
+                        } else {
+                            alert.remove();
+                        }
+                    });
+                    
+                    // Submit the form after validation passes
+                    setTimeout(() => {
+                        // Remove loading state if still on page (in case of error)
+                        if (loginButton && loginButton.dataset.originalHTML) {
+                            loginButton.innerHTML = loginButton.dataset.originalHTML;
+                            loginButton.disabled = false;
+                        }
+                        
+                        // Actually submit the form
+                        form.submit();
+                    }, 1000); // Small delay to show loading state
+                }
+            });
+        }
+        
+        // Auto-dismiss existing alerts after 5 seconds
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                try {
+                    const bsAlert = bootstrap.Alert.getInstance(alert);
+                    if (bsAlert) {
+                        bsAlert.close();
+                    } else {
+                        alert.remove();
+                    }
+                } catch (error) {
+                    // Fallback if Bootstrap alert instance fails
+                    alert.remove();
+                }
+            });
+        }, 5000);
+        
+        // Close alert when close button is clicked
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-close') || e.target.closest('.btn-close')) {
+                const alert = e.target.closest('.alert');
+                if (alert) {
+                    const bsAlert = bootstrap.Alert.getInstance(alert);
+                    if (bsAlert) {
+                        bsAlert.close();
+                    } else {
+                        alert.remove();
+                    }
+                }
+            }
+        });
+        
+        // Reset form validation on page load
+        function resetFormValidation() {
+            const inputs = document.querySelectorAll('.form-control');
+            inputs.forEach(input => {
+                input.classList.remove('is-invalid');
+                input.classList.remove('is-valid');
+            });
+        }
+        
+        // Call reset on page load
+        resetFormValidation();
+    });
+</script>
+</body>
+</html>

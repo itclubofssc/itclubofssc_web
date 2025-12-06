@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>{{ course.title }} - IT Club</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="{{ url_for('static', filename='img/favicon.png') }}" rel="icon">
+  <link href="{{ url_for('static', filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+  <!-- CDN fallbacks for icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css">
+
+  <!-- Template Main CSS File -->
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- Header -->
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center">
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="{{ url_for('admin_dashboard') }}" class="logo d-flex align-items-center">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="">
+        <span class="d-none d-lg-block">IT Club Admin</span>
+      </a>
+      <i class="bi bi-list toggle-sidebar-btn"></i>
+    </div><!-- End Logo -->
+
+    <nav class="header-nav ms-auto">
+      <ul class="d-flex align-items-center">
+        <li class="nav-item d-block d-lg-none">
+          <a class="nav-link nav-icon search-bar-toggle " href="#">
+            <i class="bi bi-search"></i>
+          </a>
+        </li>
+        <li class="nav-item dropdown pe-3">
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+            {% set _avatar_src = None %}
+            {% if admin and admin.profile_picture %}
+              {% if admin.profile_picture.startswith('http') or admin.profile_picture.startswith('/') %}
+                {% set _avatar_src = admin.profile_picture %}
+              {% else %}
+                {% set _avatar_src = url_for('static', filename=admin.profile_picture) %}
+              {% endif %}
+            {% endif %}
+            {% if _avatar_src %}
+              <img src="{{ _avatar_src }}" alt="Profile" class="rounded-circle">
+            {% else %}
+              <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width:38px;height:38px;">
+                <i class="bi bi-person-fill text-white"></i>
+              </div>
+            {% endif %}
+            <span class="d-none d-md-block dropdown-toggle ps-2">
+              {{ session.get('admin_name', 'Admin') }}
+            </span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+            <li class="dropdown-header">
+              <h6>{{ session.get('admin_name', 'Admin') }}</h6>
+              <span>{{ session.get('admin_role', 'Administrator')|title }}</span>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin_profile') }}">
+                <i class="bi bi-person"></i>
+                <span>My Profile</span>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin_settings') }}">
+                <i class="bi bi-gear"></i>
+                <span>Account Settings</span>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin_logout') }}">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Sign Out</span>
+              </a>
+            </li>
+          </ul>
+        </li><!-- End Profile Nav -->
+      </ul>
+    </nav><!-- End Icons Navigation -->
+  </header><!-- End Header -->
+
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+    <ul class="sidebar-nav" id="sidebar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+          <i class="bi bi-grid"></i><span>Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-heading">Management</li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#members-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-people"></i><span>Members</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="members-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li><a href="{{ url_for('admin_members') }}"><i class="bi bi-circle"></i><span>All Members</span></a></li>
+          <li><a href="{{ url_for('add_members') }}"><i class="bi bi-circle"></i><span>Add New Member</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#courses-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-book"></i><span>Courses</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="courses-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+          <li><a href="{{ url_for('admin_courses') }}"><i class="bi bi-circle"></i><span>All Courses</span></a></li>
+          <li><a href="{{ url_for('add_courses') }}"><i class="bi bi-circle"></i><span>Add New Course</span></a></li>
+        </ul>
+      </li>
+
+      <!-- Announcements Nav (added) -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#announcements-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-megaphone"></i><span>Announcements</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="announcements-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('admin_announcements') }}">
+              <i class="bi bi-circle"></i><span>All Announcements</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('add_announcement') }}">
+              <i class="bi bi-circle"></i><span>Add Announcement</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Announcements Nav -->
+
+      <li class="nav-heading">Pages</li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('admin_profile') }}">
+          <i class="bi bi-person"></i><span>Profile</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('index') }}" target="_blank">
+          <i class="bi bi-eye"></i><span>View Site</span>
+        </a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main id="main" class="main">
+    <div class="pagetitle">
+      <h1>Course Details</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Home</a></li>
+          <li class="breadcrumb-item"><a href="{{ url_for('admin_courses') }}">Courses</a></li>
+          <li class="breadcrumb-item active">{{ course.title }}</li>
+        </ol>
+      </nav>
+    </div>
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+          
+          <!-- Flash Messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          <!-- Course Header Card -->
+          <div class="card">
+            <div class="card-body">
+              <div class="row">
+                <!-- Course Thumbnail -->
+                <div class="col-lg-4">
+                  <div class="text-center">
+                    {% if course.thumbnail %}
+                    <img src="{{ course.thumbnail }}" alt="Course Thumbnail" class="img-fluid rounded" style="max-height: 300px; object-fit: cover;">
+                    {% else %}
+                    <div class="rounded bg-secondary d-flex align-items-center justify-content-center" style="height: 300px;">
+                      <i class="bi bi-book text-white display-1"></i>
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <!-- Course Info -->
+                <div class="col-lg-8">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <h3 class="card-title">{{ course.title }}</h3>
+                      <div class="mb-3">
+                        {% if course.is_featured %}
+                        <span class="badge bg-warning me-2">Featured</span>
+                        {% endif %}
+                        <span class="badge bg-{{ 'success' if course.status == 'active' else 'secondary' }}">
+                          {{ course.status|title if course.status else 'N/A' }}
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="badge bg-primary">ID: #{{ course.id }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Course Meta -->
+                  <div class="row mt-3">
+                    <div class="col-md-6">
+                      <p><i class="bi bi-clock me-2"></i> <strong>Duration:</strong> {{ course.time or 'Not specified' }}</p>
+                      <p><i class="bi bi-person me-2"></i> <strong>Instructor:</strong> {{ course.teacher or 'Not specified' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                      <p><i class="bi bi-tag me-2"></i> <strong>Category:</strong> {{ course.category or 'General' }}</p>
+                      <p><i class="bi bi-calendar me-2"></i> <strong>Created:</strong> {{ course.created_at[:10] if course.created_at else 'N/A' }}</p>
+                    </div>
+                  </div>
+
+                  <!-- Action Buttons -->
+                  <div class="mt-4">
+                    <a href="{{ url_for('edit_courses', course_id=course.id) }}" class="btn btn-warning">
+                      <i class="bi bi-pencil me-2"></i> Edit Course
+                    </a>
+                    <a href="{{ url_for('admin_courses') }}" class="btn btn-secondary ms-2">
+                      <i class="bi bi-arrow-left me-2"></i> Back to Courses
+                    </a>
+                    <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                      <i class="bi bi-trash me-2"></i> Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Course Content -->
+          <div class="row mt-4">
+            <!-- Course Description -->
+            <div class="col-lg-8">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Course Description</h5>
+                  {% if course.description %}
+                  <p class="card-text">{{ course.description|safe }}</p>
+                  {% else %}
+                  <p class="text-muted">No description available for this course.</p>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Course Materials -->
+              <div class="card mt-4">
+                <div class="card-body">
+                  <h5 class="card-title">Course Materials</h5>
+                  {% if course.course_video or course.course_material %}
+                  <div class="list-group">
+                    {% if course.course_video %}
+                    <a href="{{ course.course_video }}" target="_blank" class="list-group-item list-group-item-action">
+                      <i class="bi bi-play-circle me-2"></i> Course Video
+                      <span class="badge bg-primary float-end">View</span>
+                    </a>
+                    {% endif %}
+                    {% if course.course_material %}
+                    <a href="{{ course.course_material }}" target="_blank" class="list-group-item list-group-item-action">
+                      <i class="bi bi-file-earmark me-2"></i> Course Material
+                      <span class="badge bg-primary float-end">Download</span>
+                    </a>
+                    {% endif %}
+                  </div>
+                  {% else %}
+                  <p class="text-muted">No materials available for this course.</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Course Stats -->
+            <div class="col-lg-4">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Course Statistics</h5>
+                  <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                      <div>
+                        <i class="bi bi-card-checklist text-primary me-2"></i>
+                        <span>Status</span>
+                      </div>
+                      <span class="badge bg-{{ 'success' if course.status == 'active' else 'secondary' }}">
+                        {{ course.status|title }}
+                      </span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                      <div>
+                        <i class="bi bi-star text-warning me-2"></i>
+                        <span>Featured</span>
+                      </div>
+                      <span class="badge bg-{{ 'warning' if course.is_featured else 'secondary' }}">
+                        {{ 'Yes' if course.is_featured else 'No' }}
+                      </span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                      <div>
+                        <i class="bi bi-calendar-event text-info me-2"></i>
+                        <span>Created</span>
+                      </div>
+                      <span>{{ course.created_at[:10] if course.created_at else 'N/A' }}</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                      <div>
+                        <i class="bi bi-clock-history text-success me-2"></i>
+                        <span>Duration</span>
+                      </div>
+                      <span>{{ course.time or 'N/A' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Actions -->
+              <div class="card mt-4">
+                <div class="card-body">
+                  <h5 class="card-title">Quick Actions</h5>
+                  <div class="d-grid gap-2">
+                    <a href="{{ url_for('edit_courses', course_id=course.id) }}" class="btn btn-outline-warning">
+                      <i class="bi bi-pencil me-2"></i> Edit Course
+                    </a>
+                    {% if course.course_video %}
+                    <a href="{{ course.course_video }}" target="_blank" class="btn btn-outline-primary">
+                      <i class="bi bi-play-circle me-2"></i> Watch Video
+                    </a>
+                    {% endif %}
+                    {% if course.course_material %}
+                    <a href="{{ course.course_material }}" target="_blank" class="btn btn-outline-info">
+                      <i class="bi bi-download me-2"></i> Download Material
+                    </a>
+                    {% endif %}
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                      <i class="bi bi-trash me-2"></i> Delete Course
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Delete</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete course <strong>"{{ course.title }}"</strong>? This action cannot be undone.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <form method="POST" action="{{ url_for('delete_course', course_id=course.id) }}">
+            <button type="submit" class="btn btn-danger">Delete Course</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vendor JS Files -->
+  <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script>
+(function(){
+  const toggleBtns = document.querySelectorAll('.toggle-sidebar-btn');
+  const sidebar = document.getElementById('sidebar');
+  const body = document.body;
+  function toggleSidebar(e){
+    e && e.preventDefault();
+    if(!sidebar) return;
+    sidebar.classList.toggle('show-sidebar');
+    body.classList.toggle('sidebar-open');
+  }
+  toggleBtns.forEach(btn=>{
+    btn.addEventListener('click', toggleSidebar);
+    btn.addEventListener('touchstart', function(e){ e.preventDefault(); toggleSidebar(e); }, {passive:false});
+  });
+  document.addEventListener('click', function(e){
+    if(!sidebar) return;
+    if(!sidebar.contains(e.target) && !Array.from(toggleBtns).some(btn=>btn.contains(e.target))){
+      sidebar.classList.remove('show-sidebar');
+      body.classList.remove('sidebar-open');
+    }
+  });
+})();
+</script>
+
+  <!-- Template Main JS File -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

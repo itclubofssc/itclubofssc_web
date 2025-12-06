@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Edit Member - IT Club</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="{{ url_for('static', filename='img/favicon.png') }}" rel="icon">
+  <link href="{{ url_for('static', filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+  <!-- CDN fallbacks for icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- Header -->
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center">
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="{{ url_for('admin_dashboard') }}" class="logo d-flex align-items-center">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="">
+        <span class="d-none d-lg-block">IT Club Admin</span>
+      </a>
+      <i class="bi bi-list toggle-sidebar-btn"></i>
+    </div><!-- End Logo -->
+
+    <nav class="header-nav ms-auto">
+      <ul class="d-flex align-items-center">
+        <li class="nav-item d-block d-lg-none">
+          <a class="nav-link nav-icon search-bar-toggle " href="#">
+            <i class="bi bi-search"></i>
+          </a>
+        </li>
+        <li class="nav-item dropdown pe-3">
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+            {% set _avatar_src = None %}
+            {% if admin and admin.profile_picture %}
+              {% if admin.profile_picture.startswith('http') or admin.profile_picture.startswith('/') %}
+                {% set _avatar_src = admin.profile_picture %}
+              {% else %}
+                {% set _avatar_src = url_for('static', filename=admin.profile_picture) %}
+              {% endif %}
+            {% endif %}
+            {% if _avatar_src %}
+              <img src="{{ _avatar_src }}" alt="Profile" class="rounded-circle">
+            {% else %}
+              <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width:38px;height:38px;">
+                <i class="bi bi-person-fill text-white"></i>
+              </div>
+            {% endif %}
+            <span class="d-none d-md-block dropdown-toggle ps-2">
+              {{ session.get('admin_name', 'Admin') }}
+            </span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+            <li class="dropdown-header">
+              <h6>{{ session.get('admin_name', 'Admin') }}</h6>
+              <span>{{ session.get('admin_role', 'Administrator')|title }}</span>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin_profile') }}">
+                <i class="bi bi-person"></i>
+                <span>My Profile</span>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin_settings') }}">
+                <i class="bi bi-gear"></i>
+                <span>Account Settings</span>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin_logout') }}">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Sign Out</span>
+              </a>
+            </li>
+          </ul>
+        </li><!-- End Profile Nav -->
+      </ul>
+    </nav><!-- End Icons Navigation -->
+  </header><!-- End Header -->
+
+
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+
+      <li class="nav-item">
+        <a class="nav-link active" href="{{ url_for('admin_dashboard') }}">
+          <i class="bi bi-grid"></i>
+          <span>Dashboard</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+
+      <li class="nav-heading">Management</li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#members-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-people"></i><span>Members</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="members-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('admin_members') }}">
+              <i class="bi bi-circle"></i><span>All Members</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('add_members') }}">
+              <i class="bi bi-circle"></i><span>Add New Member</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Members Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#courses-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-book"></i><span>Courses</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="courses-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('admin_courses') }}">
+              <i class="bi bi-circle"></i><span>All Courses</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('add_courses') }}">
+              <i class="bi bi-circle"></i><span>Add New Course</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Courses Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#announcements-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-megaphone"></i><span>Announcements</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="announcements-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('admin_announcements') }}">
+              <i class="bi bi-circle"></i><span>All Announcements</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('add_announcement') }}">
+              <i class="bi bi-circle"></i><span>Add Announcement</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Announcements Nav -->
+
+      {% if session.get('admin_role') == 'super_admin' %}
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#admins-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-shield-lock"></i><span>Admins</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="admins-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('admin_admins') }}">
+              <i class="bi bi-circle"></i><span>All Admins</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('add_admin') }}">
+              <i class="bi bi-circle"></i><span>Add Admin</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Admins Nav -->
+      {% endif %}
+
+      <li class="nav-heading">Pages</li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('admin_profile') }}">
+          <i class="bi bi-person"></i>
+          <span>Profile</span>
+        </a>
+      </li><!-- End Profile Page Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('admin_settings') }}">
+          <i class="bi bi-gear"></i>
+          <span>Settings</span>
+        </a>
+      </li><!-- End Settings Page Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('index') }}" target="_blank">
+          <i class="bi bi-eye"></i>
+          <span>View Site</span>
+        </a>
+      </li><!-- End View Site Nav -->
+
+    </ul>
+
+  </aside><!-- End Sidebar-->
+
+  <!-- Main Content -->
+  <main id="main" class="main">
+    <div class="pagetitle">
+      <h1>Edit Member</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Home</a></li>
+          <li class="breadcrumb-item"><a href="{{ url_for('admin_members') }}">Members</a></li>
+          <li class="breadcrumb-item active">Edit Member</li>
+        </ol>
+      </nav>
+    </div>
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Edit Member Information</h5>
+
+              <!-- Flash Messages -->
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
+                      {{ message }}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+
+              <!-- Member Profile -->
+              <div class="text-center mb-4">
+                {% if member.profile_picture %}
+                <img src="{{ member.profile_picture }}" alt="Profile" class="rounded-circle" width="120" height="120">
+                {% else %}
+                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto" style="width: 120px; height: 120px;">
+                  <span class="text-white fw-bold display-6">{{ member.full_name[0]|upper if member.full_name else '?' }}</span>
+                </div>
+                {% endif %}
+                <h5 class="mt-3">{{ member.full_name }}</h5>
+                <p class="text-muted">ID: {{ member.id }}</p>
+              </div>
+
+              <form class="row g-3" method="POST" enctype="multipart/form-data">
+                
+                <div class="col-md-6">
+                  <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="full_name" value="{{ member.full_name }}" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Email <span class="text-danger">*</span></label>
+                  <input type="email" class="form-control" name="email" value="{{ member.email }}" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Class/Year</label>
+                  <input type="text" class="form-control" name="class_name" value="{{ member.class_name or '' }}">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Phone Number</label>
+                  <input type="text" class="form-control" name="phone_number" value="{{ member.phone_number or '' }}">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Telegram Username</label>
+                  <div class="input-group">
+                    <span class="input-group-text">@</span>
+                    <input type="text" class="form-control" name="telegram_username" value="{{ member.telegram_username or '' }}">
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Department</label>
+                  <select class="form-select" name="department">
+                    <option value="" {% if not member.department %}selected{% endif %}>Select Department</option>
+                    <option value="CSIT" {% if member.department == 'CSIT' %}selected{% endif %}>Cyber Security</option>
+                    <option value="BCA" {% if member.department == 'BCA' %}selected{% endif %}>Development</option>
+                    <option value="BSc IT" {% if member.department == 'BSc IT' %}selected{% endif %}>Data Science & Algorithm</option>
+                    <option value="MCA" {% if member.department == 'MCA' %}selected{% endif %}>AI & Robotics</option>
+                    <option value="Other" {% if member.department == 'Other' %}selected{% endif %}>Tech Research</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Status</label>
+                  <select class="form-select" name="status">
+                    <option value="active" {% if member.status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if member.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                  </select>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Update Profile Picture</label>
+                  <input class="form-control" type="file" name="profile_picture" accept="image/*">
+                  <div class="form-text">Leave empty to keep current picture</div>
+                </div>
+
+                <div class="col-12">
+                  <div id="newImagePreview" style="display: none;">
+                    <p class="mb-2">New Image:</p>
+                    <img id="imagePreview" class="img-thumbnail" style="max-width: 200px;">
+                  </div>
+                </div>
+
+                <!-- Password Reset -->
+                <div class="col-12">
+                  <div class="form-check">
+                    <!-- name reset_password is important so server receives the flag -->
+                    <input class="form-check-input" type="checkbox" id="resetPassword" name="reset_password" value="1">
+                    <label class="form-check-label" for="resetPassword">
+                      Reset member's password
+                    </label>
+                  </div>
+                  <div id="passwordFields" style="display: none;" class="mt-3">
+                    <label class="form-label">New Password</label>
+                    <input type="password" class="form-control" name="new_password" id="newPassword">
+                    <div class="form-text">Minimum 6 characters</div>
+                    <div class="mt-2">
+                      <label class="form-label">Confirm New Password</label>
+                      <input type="password" class="form-control" name="confirm_password" id="confirmPassword">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('admin_members') }}" class="btn btn-secondary">
+                      <i class="bi bi-arrow-left me-2"></i> Cancel
+                    </a>
+                    <div>
+                      <a href="{{ url_for('view_member', member_id=member.id) }}" class="btn btn-info me-2">
+                        <i class="bi bi-eye me-2"></i> View
+                      </a>
+                      <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-2"></i> Update
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer" class="footer">
+    <div class="copyright">
+      &copy; Copyright <strong><span>IT Club Learning Portal</span></strong>. All Rights Reserved
+    </div>
+  </footer>
+
+  <!-- Vendor JS Files -->
+  <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+  <!-- Scripts -->
+  <script>
+    // Image preview
+    document.querySelector('input[name="profile_picture"]').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const preview = document.getElementById('imagePreview');
+      const container = document.getElementById('newImagePreview');
+      
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          container.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+      } else {
+        container.style.display = 'none';
+      }
+    });
+
+    // Password reset toggle
+    (function(){
+      const resetCheckbox = document.getElementById('resetPassword');
+      const passwordFields = document.getElementById('passwordFields');
+      const newPasswordInput = document.getElementById('newPassword');
+      const confirmPasswordInput = document.getElementById('confirmPassword');
+
+      resetCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+          passwordFields.style.display = 'block';
+          newPasswordInput.required = true;
+          confirmPasswordInput.required = true;
+        } else {
+          passwordFields.style.display = 'none';
+          newPasswordInput.required = false;
+          confirmPasswordInput.required = false;
+          newPasswordInput.value = '';
+          confirmPasswordInput.value = '';
+        }
+      });
+
+      // client-side validation to avoid a round-trip; server still enforces rules
+      document.querySelector('form').addEventListener('submit', function(e) {
+        if (resetCheckbox.checked) {
+          const np = newPasswordInput.value || '';
+          const cp = confirmPasswordInput.value || '';
+          if (np.length < 6) {
+            e.preventDefault();
+            alert('New password must be at least 6 characters.');
+            return false;
+          }
+          if (np !== cp) {
+            e.preventDefault();
+            alert('New password and confirmation do not match.');
+            return false;
+          }
+        }
+        return true;
+      });
+    })();
+  </script>
+
+  <!-- Template Main JS File -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>

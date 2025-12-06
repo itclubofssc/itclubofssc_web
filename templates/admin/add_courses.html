@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Add New Course - IT Club</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="{{ url_for('static', filename='img/favicon.png') }}" rel="icon">
+  <link href="{{ url_for('static', filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+  <!-- CDN fallbacks for icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- Header -->
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center">
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="{{ url_for('admin_dashboard') }}" class="logo d-flex align-items-center">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="">
+        <span class="d-none d-lg-block">IT Club Admin</span>
+      </a>
+      <i class="bi bi-list toggle-sidebar-btn"></i>
+    </div><!-- End Logo -->
+
+    <nav class="header-nav ms-auto">
+      <ul class="d-flex align-items-center">
+        <li class="nav-item d-block d-lg-none">
+          <a class="nav-link nav-icon search-bar-toggle " href="#">
+            <i class="bi bi-search"></i>
+          </a>
+        </li>
+        <li class="nav-item dropdown pe-3">
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+            {% set _avatar_src = None %}
+            {% if admin and admin.profile_picture %}
+              {% if admin.profile_picture.startswith('http') or admin.profile_picture.startswith('/') %}
+                {% set _avatar_src = admin.profile_picture %}
+              {% else %}
+                {% set _avatar_src = url_for('static', filename=admin.profile_picture) %}
+              {% endif %}
+            {% endif %}
+            {% if _avatar_src %}
+              <img src="{{ _avatar_src }}" alt="Profile" class="rounded-circle">
+            {% else %}
+              <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width:38px;height:38px;">
+                <i class="bi bi-person-fill text-white"></i>
+              </div>
+            {% endif %}
+            <span class="d-none d-md-block dropdown-toggle ps-2">
+              {{ session.get('admin_name', 'Admin') }}
+            </span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+            <li class="dropdown-header">
+              <h6>{{ session.get('admin_name', 'Admin') }}</h6>
+              <span>{{ session.get('admin_role', 'Administrator')|title }}</span>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin_profile') }}">
+                <i class="bi bi-person"></i>
+                <span>My Profile</span>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin_settings') }}">
+                <i class="bi bi-gear"></i>
+                <span>Account Settings</span>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin_logout') }}">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Sign Out</span>
+              </a>
+            </li>
+          </ul>
+        </li><!-- End Profile Nav -->
+      </ul>
+    </nav><!-- End Icons Navigation -->
+  </header><!-- End Header -->
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+
+      <li class="nav-item">
+        <a class="nav-link active" href="{{ url_for('admin_dashboard') }}">
+          <i class="bi bi-grid"></i>
+          <span>Dashboard</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+
+      <li class="nav-heading">Management</li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#members-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-people"></i><span>Members</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="members-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('admin_members') }}">
+              <i class="bi bi-circle"></i><span>All Members</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('add_members') }}">
+              <i class="bi bi-circle"></i><span>Add New Member</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Members Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#courses-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-book"></i><span>Courses</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="courses-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('admin_courses') }}">
+              <i class="bi bi-circle"></i><span>All Courses</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('add_courses') }}">
+              <i class="bi bi-circle"></i><span>Add New Course</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Courses Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#announcements-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-megaphone"></i><span>Announcements</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="announcements-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('admin_announcements') }}">
+              <i class="bi bi-circle"></i><span>All Announcements</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('add_announcement') }}">
+              <i class="bi bi-circle"></i><span>Add Announcement</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Announcements Nav -->
+
+      {% if session.get('admin_role') == 'super_admin' %}
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#admins-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-shield-lock"></i><span>Admins</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="admins-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="{{ url_for('admin_admins') }}">
+              <i class="bi bi-circle"></i><span>All Admins</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('add_admin') }}">
+              <i class="bi bi-circle"></i><span>Add Admin</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Admins Nav -->
+      {% endif %}
+
+      <li class="nav-heading">Pages</li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('admin_profile') }}">
+          <i class="bi bi-person"></i>
+          <span>Profile</span>
+        </a>
+      </li><!-- End Profile Page Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('admin_settings') }}">
+          <i class="bi bi-gear"></i>
+          <span>Settings</span>
+        </a>
+      </li><!-- End Settings Page Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('index') }}" target="_blank">
+          <i class="bi bi-eye"></i>
+          <span>View Site</span>
+        </a>
+      </li><!-- End View Site Nav -->
+
+    </ul>
+
+  </aside><!-- End Sidebar-->
+
+
+
+  <!-- Main Content -->
+  <main id="main" class="main">
+    <div class="pagetitle">
+      <h1>Add New Course</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Home</a></li>
+          <li class="breadcrumb-item"><a href="{{ url_for('admin_courses') }}">Courses</a></li>
+          <li class="breadcrumb-item active">Add New</li>
+        </ol>
+      </nav>
+    </div>
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Course Information</h5>
+
+              <!-- Flash Messages -->
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
+                      {{ message }}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+
+              <form class="row g-3" method="POST" enctype="multipart/form-data">
+                
+                <!-- Basic Information -->
+                <div class="col-md-12">
+                  <label class="form-label">Course Title <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="title" required placeholder="e.g., Python Programming">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Category</label>
+                  <select class="form-select" name="category">
+                    <option value="">Select Category</option>
+                    <option value="Programming">Programming</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Database">Database</option>
+                    <option value="Networking">Networking</option>
+                    <option value="AI/ML">AI/ML</option>
+                    <option value="Cybersecurity">Cybersecurity</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Duration/Time</label>
+                  <input type="text" class="form-control" name="time" placeholder="e.g., 4 weeks, 2 hours per week">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Instructor/Teacher</label>
+                  <input type="text" class="form-control" name="teacher" placeholder="e.g., Dr. John Smith">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Status</label>
+                  <select class="form-select" name="status">
+                    <option value="active" selected>Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+
+                <!-- Course Description -->
+                <div class="col-12">
+                  <label class="form-label">Course Description</label>
+                  <textarea class="form-control" name="description" rows="5" placeholder="Describe the course content, learning outcomes, etc."></textarea>
+                </div>
+
+                <!-- Course Video -->
+                <div class="col-12">
+                  <label class="form-label">Course Video URL (Optional)</label>
+                  <input type="url" class="form-control" name="course_video" placeholder="https://youtube.com/watch?v=...">
+                  <div class="form-text">YouTube, Vimeo, or other video platform URL</div>
+                </div>
+
+                <!-- Course Materials -->
+                <div class="col-md-6">
+                  <label class="form-label">Material URL (Optional)</label>
+                  <input type="url" class="form-control" name="course_material_url" placeholder="https://drive.google.com/...">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Or Upload Material File</label>
+                  <input class="form-control" type="file" name="course_material_file" accept=".pdf,.doc,.docx,.ppt,.pptx">
+                  <div class="form-text">PDF, DOC, PPT files only. Max 10MB</div>
+                </div>
+
+                <!-- Thumbnail Upload -->
+                <div class="col-12">
+                  <label class="form-label">Course Thumbnail</label>
+                  <input class="form-control" type="file" name="thumbnail" accept="image/*" id="thumbnailInput">
+                  <div class="form-text">Recommended: 800x450px. JPG, PNG, GIF. Max 2MB</div>
+                </div>
+
+                <!-- Thumbnail Preview -->
+                <div class="col-12">
+                  <div id="thumbnailPreviewContainer" style="display: none;">
+                    <p class="mb-2">Thumbnail Preview:</p>
+                    <img id="thumbnailPreview" class="img-thumbnail" style="max-width: 300px;">
+                  </div>
+                </div>
+
+                <!-- Featured Course -->
+                <div class="col-12">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="is_featured" value="1" id="featuredCheck">
+                    <label class="form-check-label" for="featuredCheck">
+                      Mark as Featured Course
+                    </label>
+                    <div class="form-text">Featured courses appear prominently on the site</div>
+                  </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="col-12">
+                  <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('admin_courses') }}" class="btn btn-secondary">
+                      <i class="bi bi-arrow-left me-2"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                      <i class="bi bi-plus-circle me-2"></i> Add Course
+                    </button>
+                  </div>
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer" class="footer">
+    <div class="copyright">
+      &copy; Copyright <strong><span>IT Club Learning Portal</span></strong>. All Rights Reserved
+    </div>
+  </footer>
+
+  <!-- Vendor JS Files -->
+  <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+  <!-- Scripts -->
+  <script>
+    // Thumbnail preview
+    document.getElementById('thumbnailInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const preview = document.getElementById('thumbnailPreview');
+      const container = document.getElementById('thumbnailPreviewContainer');
+      
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          container.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+      } else {
+        container.style.display = 'none';
+      }
+    });
+
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+      const title = document.querySelector('input[name="title"]').value;
+      if (!title.trim()) {
+        e.preventDefault();
+        alert('Course title is required.');
+        return false;
+      }
+      return true;
+    });
+  </script>
+
+  <script>
+(function(){
+  const toggleBtns = document.querySelectorAll('.toggle-sidebar-btn');
+  const sidebar = document.getElementById('sidebar');
+  const body = document.body;
+  function toggleSidebar(e){
+    e && e.preventDefault();
+    if(!sidebar) return;
+    sidebar.classList.toggle('show-sidebar');
+    body.classList.toggle('sidebar-open');
+  }
+  toggleBtns.forEach(btn=>{
+    btn.addEventListener('click', toggleSidebar);
+    btn.addEventListener('touchstart', function(e){ e.preventDefault(); toggleSidebar(e); }, {passive:false});
+  });
+  document.addEventListener('click', function(e){
+    if(!sidebar) return;
+    if(!sidebar.contains(e.target) && !Array.from(toggleBtns).some(btn=>btn.contains(e.target))){
+      sidebar.classList.remove('show-sidebar');
+      body.classList.remove('sidebar-open');
+    }
+  });
+})();
+</script>
+
+  <!-- Template Main JS File -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - IT Club</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        /* Simple Coming Soon Page CSS */
+:root {
+    --primary-color: #6366f1;
+    --secondary-color: #8b5cf6;
+    --dark-color: #0f172a;
+}
+
+.coming-soon-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--dark-color) 0%, #0f172a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.coming-soon-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.coming-soon-container {
+    text-align: center;
+    max-width: 600px;
+    position: relative;
+    z-index: 1;
+    margin: 0 auto;
+}
+
+.dashboard-icon {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    color: white;
+    font-size: 3.5rem;
+    box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+.coming-soon-title {
+    color: #f8fafc;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 3rem;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-align: center;
+}
+
+.coming-soon-subtitle {
+    color: #94a3b8;
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    text-align: center;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.back-btn {
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    border: none;
+    color: white;
+    padding: 0.875rem 2rem;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    margin-top: 1rem;
+    justify-content: center;
+}
+
+.back-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .coming-soon-title {
+        font-size: 2.5rem;
+    }
+    
+    .dashboard-icon {
+        width: 100px;
+        height: 100px;
+        font-size: 2.5rem;
+    }
+    
+    .coming-soon-subtitle {
+        font-size: 1.1rem;
+        padding: 0 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .coming-soon-page {
+        padding: 1rem;
+    }
+    
+    .coming-soon-title {
+        font-size: 2rem;
+    }
+    
+    .coming-soon-subtitle {
+        font-size: 1rem;
+    }
+    
+    .dashboard-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+    }
+    
+    .back-btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.95rem;
+    }
+}
+    </style>
+</head>
+<body>
+
+    <!-- Coming Soon Page -->
+    <div class="coming-soon-page">
+        <div class="container">
+            <div class="coming-soon-container">
+                <div class="dashboard-icon">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                
+                <h1 class="coming-soon-title">Dashboard Coming Soon</h1>
+                
+                <p class="coming-soon-subtitle">
+                    We're building an amazing dashboard experience for IT Club members. 
+                    Get ready for personalized tracking, progress monitoring, and exclusive member features.
+                </p>
+                
+                <a href="/home" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Homepage
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Countdown Timer
+        function updateCountdown() {
+            // Set launch date (3 months from now)
+            const launchDate = new Date();
+            launchDate.setMonth(launchDate.getMonth() + 3);
+            
+            const now = new Date().getTime();
+            const distance = launchDate - now;
+            
+            if (distance < 0) {
+                // Launch date passed
+                document.getElementById('days').innerHTML = '00';
+                document.getElementById('hours').innerHTML = '00';
+                document.getElementById('minutes').innerHTML = '00';
+                document.getElementById('seconds').innerHTML = '00';
+                return;
+            }
+            
+            // Calculate time units
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            // Update display
+            document.getElementById('days').innerHTML = days.toString().padStart(2, '0');
+            document.getElementById('hours').innerHTML = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').innerHTML = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').innerHTML = seconds.toString().padStart(2, '0');
+        }
+        
+        // Initialize countdown
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+        
+        // Progress bar animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBar = document.querySelector('.progress-bar');
+            setTimeout(() => {
+                progressBar.style.transition = 'width 2s ease-in-out';
+                progressBar.style.width = '65%';
+            }, 500);
+        });
+    </script>
+</body>
+</html>

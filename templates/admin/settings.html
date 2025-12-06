@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- ...existing head code... -->
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Account Settings - IT Club Portal</title>
+    <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/quill/quill.snow.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/quill/quill.bubble.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/remixicon/remixicon.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/simple-datatables/style.css') }}" rel="stylesheet">
+
+  <!-- CDN fallbacks for icons (use if local vendor files are missing/wrong path) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css">
+
+  <!-- Template Main CSS File -->
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center">
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="{{ url_for('admin_dashboard') }}" class="logo d-flex align-items-center">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="">
+        <span class="d-none d-lg-block">IT Club Admin</span>
+      </a>
+      <i class="bi bi-list toggle-sidebar-btn"></i>
+    </div><!-- End Logo -->
+
+    <nav class="header-nav ms-auto">
+      <ul class="d-flex align-items-center">
+        <li class="nav-item d-block d-lg-none">
+          <a class="nav-link nav-icon search-bar-toggle " href="#">
+            <i class="bi bi-search"></i>
+          </a>
+        </li>
+        <li class="nav-item dropdown pe-3">
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+            {% set _avatar_src = None %}
+            {% if admin and admin.profile_picture %}
+              {% if admin.profile_picture.startswith('http') or admin.profile_picture.startswith('/') %}
+                {% set _avatar_src = admin.profile_picture %}
+              {% else %}
+                {% set _avatar_src = url_for('static', filename=admin.profile_picture) %}
+              {% endif %}
+            {% endif %}
+            {% if _avatar_src %}
+              <img src="{{ _avatar_src }}" alt="Profile" class="rounded-circle">
+            {% else %}
+              <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width:38px;height:38px;">
+                <i class="bi bi-person-fill text-white"></i>
+              </div>
+            {% endif %}
+            <span class="d-none d-md-block dropdown-toggle ps-2">
+              {{ session.get('admin_name', 'Admin') }}
+            </span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+            <li class="dropdown-header">
+              <h6>{{ session.get('admin_name', 'Admin') }}</h6>
+              <span>{{ session.get('admin_role', 'Administrator')|title }}</span>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin_profile') }}">
+                <i class="bi bi-person"></i>
+                <span>My Profile</span>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin_settings') }}">
+                <i class="bi bi-gear"></i>
+                <span>Account Settings</span>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin_logout') }}">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Sign Out</span>
+              </a>
+            </li>
+          </ul>
+        </li><!-- End Profile Nav -->
+      </ul>
+    </nav><!-- End Icons Navigation -->
+  </header><!-- End Header -->
+
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+    <ul class="sidebar-nav" id="sidebar-nav">
+      <li class="nav-item">
+        <a class="nav-link active" href="{{ url_for('admin_dashboard') }}">
+          <i class="bi bi-grid"></i>
+          <span>Dashboard</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+
+      <li class="nav-heading">Management</li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#members-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-people"></i><span>Members</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="members-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li><a href="{{ url_for('admin_members') }}"><i class="bi bi-circle"></i><span>All Members</span></a></li>
+          <li><a href="{{ url_for('add_members') }}"><i class="bi bi-circle"></i><span>Add New Member</span></a></li>
+        </ul>
+      </li><!-- End Members Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#courses-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-book"></i><span>Courses</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="courses-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li><a href="{{ url_for('admin_courses') }}"><i class="bi bi-circle"></i><span>All Courses</span></a></li>
+          <li><a href="{{ url_for('add_courses') }}"><i class="bi bi-circle"></i><span>Add New Course</span></a></li>
+        </ul>
+      </li><!-- End Courses Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#announcements-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-megaphone"></i><span>Announcements</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="announcements-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li><a href="{{ url_for('admin_announcements') }}"><i class="bi bi-circle"></i><span>All Announcements</span></a></li>
+          <li><a href="{{ url_for('add_announcement') }}"><i class="bi bi-circle"></i><span>Add Announcement</span></a></li>
+        </ul>
+      </li><!-- End Announcements Nav -->
+
+      {% if session.get('admin_role') == 'super_admin' %}
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#admins-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-shield-lock"></i><span>Admins</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="admins-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+          <li><a href="{{ url_for('admin_admins') }}"><i class="bi bi-circle"></i><span>All Admins</span></a></li>
+          <li><a href="{{ url_for('add_admin') }}"><i class="bi bi-circle"></i><span>Add Admin</span></a></li>
+        </ul>
+      </li><!-- End Admins Nav -->
+      {% endif %}
+
+      <li class="nav-heading">Pages</li>
+
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_profile') }}"><i class="bi bi-person"></i><span>Profile</span></a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_settings') }}"><i class="bi bi-gear"></i><span>Settings</span></a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}" target="_blank"><i class="bi bi-eye"></i><span>View Site</span></a></li>
+    </ul>
+  </aside><!-- End Sidebar-->
+
+  <!-- ...existing main content (unchanged) ... -->
+  <main id="main" class="main">
+    <div class="pagetitle">
+      <h1>Account Settings</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Home</a></li>
+          <li class="breadcrumb-item active">Settings</li>
+        </ol>
+      </nav>
+    </div>
+    <section class="section profile">
+      <div class="row justify-content-center">
+        <div class="col-xl-8">
+          <div class="card">
+            <div class="card-body pt-3">
+              <h5 class="card-title">Edit Account</h5>
+              <form method="POST" enctype="multipart/form-data">
+                <div class="row mb-3">
+                  <label class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
+                  <div class="col-md-8 col-lg-9">
+                    <img src="{{ admin.profile_picture or url_for('static', filename='img/profile-img.jpg') }}" alt="Profile" class="rounded-circle" style="width:80px;height:80px;object-fit:cover;">
+                    <input type="file" name="profile_picture" class="form-control mt-2">
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label class="col-md-4 col-lg-3 col-form-label">Full Name</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="full_name" type="text" class="form-control" value="{{ admin.full_name }}">
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label class="col-md-4 col-lg-3 col-form-label">Username</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="username" type="text" class="form-control" value="{{ admin.username }}">
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label class="col-md-4 col-lg-3 col-form-label">Email</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="email" type="email" class="form-control" value="{{ admin.email }}">
+                  </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                  <label class="col-md-4 col-lg-3 col-form-label">Current Password</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="current_password" type="password" class="form-control" placeholder="Enter to change password">
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label class="col-md-4 col-lg-3 col-form-label">New Password</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="new_password" type="password" class="form-control" placeholder="New password">
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label class="col-md-4 col-lg-3 col-form-label">Confirm Password</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="confirm_password" type="password" class="form-control" placeholder="Confirm new password">
+                  </div>
+                </div>
+                <div class="text-center">
+                  <button type="submit" class="btn btn-success">
+                    <i class="bi bi-save me-1"></i> Save Changes
+                  </button>
+                  <a href="{{ url_for('admin_profile') }}" class="btn btn-secondary ms-2">Cancel</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- replaced include: full footer + scripts inserted here (same as dashboard footer/scripts) -->
+  <footer id="footer" class="footer">
+    <div class="copyright">
+      &copy; Copyright <strong><span>IT Club Learning Portal</span></strong>. All Rights Reserved
+    </div>
+    <div class="credits">
+      Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+    </div>
+  </footer>
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <script src="{{ url_for('static', filename='vendor/apexcharts/apexcharts.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/chart.js/chart.umd.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/echarts/echarts.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/quill/quill.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/simple-datatables/simple-datatables.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/tinymce/tinymce.min.js') }}"></script>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>
+  (function(){
+    const toggleBtns = document.querySelectorAll('.toggle-sidebar-btn');
+    const sidebar = document.getElementById('sidebar');
+    const body = document.body;
+    function toggleSidebar(e){
+      e && e.preventDefault();
+      if(!sidebar) return;
+      sidebar.classList.toggle('show-sidebar');
+      body.classList.toggle('sidebar-open');
+    }
+    toggleBtns.forEach(btn=>{
+      btn.addEventListener('click', toggleSidebar);
+      btn.addEventListener('touchstart', function(e){ e.preventDefault(); toggleSidebar(e); }, {passive:false});
+    });
+    document.addEventListener('click', function(e){
+      if(!sidebar) return;
+      if(!sidebar.contains(e.target) && !Array.from(toggleBtns).some(btn=>btn.contains(e.target))){
+        sidebar.classList.remove('show-sidebar');
+        body.classList.remove('sidebar-open');
+      }
+    });
+  })();
+  </script>
+
+</body>
+</html>
