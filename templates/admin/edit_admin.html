@@ -1,14 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
-  <title>Add New Member - IT Club</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
-
+  <title>Edit Admin - IT Club</title>
   <!-- Favicons -->
   <link href="{{ url_for('static', filename='img/favicon.png') }}" rel="icon">
   <link href="{{ url_for('static', filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
@@ -21,14 +16,15 @@
   <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/quill/quill.snow.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/quill/quill.bubble.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/remixicon/remixicon.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/simple-datatables/style.css') }}" rel="stylesheet">
 
   <!-- Template Main CSS File -->
   <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 </head>
-
 <body>
-
-  <!-- Header -->
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <div class="d-flex align-items-center justify-content-between">
@@ -64,7 +60,7 @@
               </div>
             {% endif %}
             <span class="d-none d-md-block dropdown-toggle ps-2">
-              {{ admin.full_name if admin and admin.full_name else session.get('admin_name', 'Admin') }}
+              {{ session.get('admin_name', 'Admin') }}
             </span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
@@ -100,8 +96,6 @@
   </header><!-- End Header -->
 
 
-
-  <!-- Sidebar -->
   <aside id="sidebar" class="sidebar">
 
     <ul class="sidebar-nav" id="sidebar-nav">
@@ -216,164 +210,83 @@
 
   </aside><!-- End Sidebar-->
 
-  <!-- Main Content -->
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>Add New Member</h1>
+      <h1>Edit Admin</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Home</a></li>
-          <li class="breadcrumb-item"><a href="{{ url_for('admin_members') }}">Members</a></li>
-          <li class="breadcrumb-item active">Add New</li>
+          <li class="breadcrumb-item"><a href="{{ url_for('admin_admins') }}">Admins</a></li>
+          <li class="breadcrumb-item active">Edit</li>
         </ol>
       </nav>
     </div>
 
     <section class="section">
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Member Information</h5>
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Update Admin</h5>
 
-              <!-- Flash Messages -->
-              {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                  {% for category, message in messages %}
-                    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
-                      {{ message }}
-                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                  {% endfor %}
-                {% endif %}
-              {% endwith %}
+          <form action="{{ url_for('edit_admin', admin_id=admin.id) }}" method="post" enctype="multipart/form-data">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Full Name</label>
+                <input name="full_name" class="form-control" value="{{ admin.full_name }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Username</label>
+                <input name="username" class="form-control" value="{{ admin.username }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input name="email" type="email" class="form-control" value="{{ admin.email }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Role</label>
+                <select name="role" class="form-select" required>
+                  <option value="admin" {% if admin.role == 'admin' %}selected{% endif %}>Admin</option>
+                  <option value="super_admin" {% if admin.role == 'super_admin' %}selected{% endif %}>Super Admin</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Profile Picture</label>
+                <input name="profile_picture" type="file" class="form-control" accept="image/*">
+                <div class="form-text">Leave empty to keep current</div>
+              </div>
 
-              <form class="row g-3" method="POST" enctype="multipart/form-data">
-                
-                <div class="col-md-6">
-                  <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" name="full_name" required>
-                </div>
-
-                <div class="col-md-6">
-                  <label class="form-label">Email <span class="text-danger">*</span></label>
-                  <input type="email" class="form-control" name="email" required>
-                </div>
-
-                <div class="col-md-6">
-                  <label class="form-label">Password <span class="text-danger">*</span></label>
-                  <input type="password" class="form-control" name="password" required minlength="6">
-                  <div class="form-text">Minimum 6 characters</div>
-                </div>
-
-                <div class="col-md-6">
-                  <label class="form-label">Class/Year</label>
-                  <input type="text" class="form-control" name="class_name" placeholder="e.g., CSIT 4th Year">
-                </div>
-
-                <div class="col-md-6">
-                  <label class="form-label">Phone Number</label>
-                  <input type="text" class="form-control" name="phone_number" placeholder="+977 98xxxxxxxx">
-                </div>
-
-                <div class="col-md-6">
-                  <label class="form-label">Telegram Username</label>
-                  <div class="input-group">
-                    <span class="input-group-text">@</span>
-                    <input type="text" class="form-control" name="telegram_username" placeholder="username">
-                  </div>
-                </div>
-
-                <div class="col-md-6">
-                  <label class="form-label">Department</label>
-                  <select class="form-select" name="department">
-                    <option value="">Select Department</option>
-                    <option value="Cybersecurity">Cyber Security</option>
-                    <option value="Development">Development</option>
-                    <option value="Data Science & Algorithm">Data Science& Algorithm</option>
-                    <option value="AI & Robotics">AI & Robotics</option>
-                    <option value="Tech Research">Tech Research</option>
-                  </select>
-                </div>
-
-                <div class="col-md-6">
-                  <label class="form-label">Status</label>
-                  <select class="form-select" name="status">
-                    <option value="active" selected>Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                </div>
-
-                <div class="col-12">
-                  <label class="form-label">Profile Picture</label>
-                  <input class="form-control" type="file" name="profile_picture" accept="image/*">
-                  <div class="form-text">JPG, PNG, GIF. Max 2MB</div>
-                </div>
-
-                <div class="col-12">
-                  <div id="imagePreviewContainer" style="display: none;">
-                    <img id="imagePreview" class="img-thumbnail mt-2" style="max-width: 200px;">
-                  </div>
-                </div>
-
-                <div class="col-12">
-                  <div class="d-flex justify-content-between">
-                    <a href="{{ url_for('admin_members') }}" class="btn btn-secondary">
-                      <i class="bi bi-arrow-left me-2"></i> Cancel
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                      <i class="bi bi-person-plus me-2"></i> Add Member
-                    </button>
-                  </div>
-                </div>
-
-              </form>
+              <div class="col-12 d-flex justify-content-between">
+                <a href="{{ url_for('admin_admins') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+              </div>
             </div>
-          </div>
+          </form>
+
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Footer -->
   <footer id="footer" class="footer">
     <div class="copyright">
       &copy; Copyright <strong><span>IT Club Learning Portal</span></strong>. All Rights Reserved
     </div>
-  </footer>
+    <div class="credits">
+      Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
+  <script src="{{ url_for('static', filename='vendor/apexcharts/apexcharts.min.js') }}"></script>
   <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/chart.js/chart.umd.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/echarts/echarts.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/quill/quill.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/simple-datatables/simple-datatables.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/tinymce/tinymce.min.js') }}"></script>
 
-  <!-- Image Preview Script -->
-  <script>
-    document.querySelector('input[name="profile_picture"]').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      const preview = document.getElementById('imagePreview');
-      const container = document.getElementById('imagePreviewContainer');
-      
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          preview.src = e.target.result;
-          container.style.display = 'block';
-        }
-        reader.readAsDataURL(file);
-      } else {
-        container.style.display = 'none';
-      }
-    });
-
-    document.querySelector('form').addEventListener('submit', function(e) {
-      const password = document.querySelector('input[name="password"]').value;
-      if (password.length < 6) {
-        e.preventDefault();
-        alert('Password must be at least 6 characters.');
-        return false;
-      }
-      return true;
-    });
-  </script>
-
+  <!-- Template Main JS File -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

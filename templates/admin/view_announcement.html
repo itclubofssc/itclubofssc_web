@@ -67,7 +67,7 @@
               </div>
             {% endif %}
             <span class="d-none d-md-block dropdown-toggle ps-2">
-              {{ session.get('admin_name', 'Admin') }}
+              {{ admin.full_name if admin and admin.full_name else session.get('admin_name', 'Admin') }}
             </span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
