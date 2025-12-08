@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses - IT Club</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('home') }}" class="sidebar-brand">
+                    <i class="fas fa-laptop-code"></i>
+                    <span>IT Club</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a href="{{ url_for('dashboard') }}" class="menu-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('courses') }}" class="menu-item active">
+                    <i class="fas fa-book-open"></i>
+                    <span>Courses</span>
+                </a>
+                <a href="{{ url_for('profile') }}" class="menu-item">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                
+                <div class="menu-divider"></div>
+                
+                <a href="{{ url_for('profile_update') }}" class="menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="menu-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+                    </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <button class="hamburger-btn" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <h1 class="h4 mb-0 text-gradient">
+                    <i class="fas fa-book-open me-2"></i>
+                    Courses
+                </h1>
+                
+                <div class="user-profile">
+                    {% if member.profile_picture %}
+                    <img src="{{ member.profile_picture }}" alt="Profile" class="user-avatar">
+                    {% else %}
+                    <div class="user-avatar bg-primary d-flex align-items-center justify-content-center">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                    {% endif %}
+                    <span class="text-white">{{ member.full_name }}</span>
+                </div>
+            </div>
+
+            <!-- Courses Header -->
+            <div class="courses-header">
+                <h1 class="h2 text-white mb-3">Explore Our Courses</h1>
+           </div>
+
+            <div class="row">
+                <!-- Courses Grid -->
+                <div class="col-lg-9">
+                    <!-- Results Count -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="text-white mb-0">
+                            {% if selected_category %}
+                            <i class="fas fa-folder me-2 text-primary"></i>
+                            {{ selected_category }}
+                            {% else %}
+                            <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                            All Courses
+                            {% endif %}
+                            <span class="badge bg-primary ms-2">{{ courses|length }}</span>
+                        </h5>
+                        
+                        {% if search_query %}
+                        <a href="{{ url_for('courses') }}" class="btn btn-sm btn-outline-custom">
+                            <i class="fas fa-times me-1"></i>
+                            Clear Search
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    {% if courses %}
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                        {% for course in courses %}
+                        <div class="col">
+                            <div class="course-card card-custom position-relative">
+                                {% if course.is_featured %}
+                                <span class="featured-badge">
+                                    <i class="fas fa-star me-1"></i> Featured
+                                </span>
+                                {% endif %}
+                                
+                                {% if course.thumbnail %}
+                                <img src="{{ course.thumbnail }}" class="course-thumbnail" alt="{{ course.title }}">
+                                {% else %}
+                                <div class="course-thumbnail bg-dark d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-graduation-cap fa-3x text-primary"></i>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="course-category">{{ course.category or 'General' }}</span>
+                                        {% if course.status == 'active' %}
+                                        <span class="badge-custom badge-active">Active</span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <h6 class="text-white mb-2">{{ course.title }}</h6>
+                                    
+                                    <p class="small text-secondary mb-3">
+                                        {{ course.description[:100] }}{% if course.description|length > 100 %}...{% endif %}
+                                    </p>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <small class="text-secondary d-block">
+                                                <i class="fas fa-user-tie me-1"></i>
+                                                {{ course.teacher or 'Instructor' }}
+                                            </small>
+                                            {% if course.time %}
+                                            <small class="text-secondary">
+                                                <i class="fas fa-clock me-1"></i>
+                                                {{ course.time }}
+                                            </small>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <a href="{{ url_for('course_details', course_id=course.id) }}" 
+                                           class="btn btn-sm btn-primary-custom">
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-book-open fa-4x text-secondary mb-4"></i>
+                        <h4 class="text-white mb-3">No Courses Found</h4>
+                        <p class="text-secondary mb-4">
+                            {% if search_query %}
+                            No courses match your search criteria. Try different keywords or categories.
+                            {% else %}
+                            No courses are available at the moment. Please check back later.
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sidebar toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('show');
+        });
+
+        // Category filter active state
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-submit category filter on change
+            const categorySelect = document.querySelector('select[name="category"]');
+            if (categorySelect) {
+                categorySelect.addEventListener('change', function() {
+                    this.form.submit();
+                });
+            }
+            
+            // Handle active states for category buttons
+            const currentCategory = '{{ selected_category }}';
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            
+            categoryButtons.forEach(btn => {
+                if (btn.textContent.includes(currentCategory) && currentCategory) {
+                    btn.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

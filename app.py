@@ -6,7 +6,7 @@ from flask import Flask, redirect, render_template, request, g, url_for, flash, 
 import bcrypt
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
-from flask import url_for
+from flask import url_for, render_template_string
 
 load_dotenv()
 
@@ -14,8 +14,8 @@ app = Flask(__name__)
 
 app.secret_key = os.environ.get('SECRET_KEY', os.urandom(32))
 
-app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')  # used to build URL path (e.g. /static/uploads/...)
-app.config['UPLOAD_PATH'] = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])  # absolute filesystem path
+app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')  
+app.config['UPLOAD_PATH'] = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])  
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['DATABASE'] = os.path.join(app.instance_path, 'database.db')
 
@@ -44,14 +44,14 @@ def save_file(file_storage, file_type='image'):
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     unique_filename = f"{timestamp}_{filename}"
     
-    # filesystem destination (absolute)
+    
     fs_dest = os.path.join(app.config['UPLOAD_PATH'], unique_filename)
     try:
         file_storage.save(fs_dest)
     except:
-        # fail silently and return None if save fails
+        
         return None
-    # return a URL-style path (starts with '/') so templates can show it directly
+    
     url_path = '/' + os.path.join(app.config['UPLOAD_FOLDER'], unique_filename).replace('\\', '/')
     return url_path
 
@@ -145,14 +145,12 @@ def init_db():
     )
     ''')
 
-    # Ensure 'profile_picture' column exists in admins (safe migration for existing DBs)
     cursor.execute("PRAGMA table_info(admins)")
     admin_cols = [row[1] for row in cursor.fetchall()]
     if 'profile_picture' not in admin_cols:
         try:
             cursor.execute("ALTER TABLE admins ADD COLUMN profile_picture TEXT")
         except Exception:
-            # ignore if migration fails for any reason
             pass
 
     cursor.execute('''
@@ -167,7 +165,6 @@ def init_db():
     )
     ''')
 
-    # Ensure 'poster' column exists in announcements (safe migration for existing DBs)
     cursor.execute("PRAGMA table_info(announcements)")
     cols = [row[1] for row in cursor.fetchall()]
     if 'poster' not in cols:
@@ -198,7 +195,7 @@ def init_db():
 def ensure_instance_path():
     if not os.path.exists(app.instance_path):
         os.makedirs(app.instance_path)
-        
+            
 def admin_required(f):
     @functools.wraps(f)
     def decorated(*args, **kwargs):
@@ -226,16 +223,13 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated
 
-# Add helpers near top (after imports)
 def row_to_dict(row):
 	"""Convert sqlite3.Row to dict (safe if row is None)."""
 	if row is None:
 		return None
 	try:
-		# sqlite3.Row supports keys()
 		return {k: row[k] for k in row.keys()}
 	except Exception:
-		# fallback
 		try:
 			return dict(row)
 		except Exception:
@@ -252,7 +246,6 @@ def resolve_media_path(val):
 	val = str(val)
 	if val.startswith('http://') or val.startswith('https://') or val.startswith('/'):
 		return val
-	# treat as path relative to static/
 	return url_for('static', filename=val)
 
 # ========================= USER ROUTES ======================
@@ -278,9 +271,7 @@ def home():
         d = row_to_dict(r)
         if not d:
             continue
-        # resolve poster so template can use it directly
         d['poster'] = resolve_media_path(d.get('poster'))
-        # ensure author_name exists
         if not d.get('author_name'):
             author = db.execute('SELECT full_name FROM admins WHERE id = ?', (d.get('author_id'),)).fetchone()
             d['author_name'] = author['full_name'] if author else 'IT Club Admin'
@@ -364,13 +355,24 @@ def dashboard():
     member_id = session['member_id']
     
     member = db.execute('SELECT * FROM members WHERE id = ?', (member_id,)).fetchone()
+    
     courses = db.execute('SELECT * FROM courses WHERE status = "active" ORDER BY created_at DESC LIMIT 6').fetchall()
     
-    announcements = db.execute('''
-        SELECT * FROM announcements 
-        WHERE is_public = 1 
-        ORDER BY created_at DESC LIMIT 5
+    announcements_rows = db.execute('''
+        SELECT a.*, ad.full_name as author_name
+        FROM announcements a
+        LEFT JOIN admins ad ON a.author_id = ad.id
+        WHERE a.is_public = 1
+        ORDER BY a.created_at DESC
+        LIMIT 4
     ''').fetchall()
+    
+    announcements = []
+    for ann in announcements_rows:
+        announcement_dict = dict(ann)
+        if announcement_dict.get('poster'):
+            announcement_dict['poster'] = resolve_media_path(announcement_dict['poster'])
+        announcements.append(announcement_dict)
     
     return render_template('main/dashboard.html', 
                           member=member, 
@@ -400,11 +402,20 @@ def courses():
     
     categories = db.execute('SELECT DISTINCT category FROM courses WHERE category IS NOT NULL').fetchall()
     
+    # try to provide current member to template (so header/profile uses it safely)
+    member = None
+    if session.get('member_id'):
+        mrow = db.execute('SELECT * FROM members WHERE id = ?', (session['member_id'],)).fetchone()
+        member = row_to_dict(mrow) if mrow else None
+        if member:
+            member['profile_picture'] = resolve_media_path(member.get('profile_picture'))
+    
     return render_template('main/courses.html', 
                           courses=courses_list, 
                           categories=categories,
                           selected_category=category,
-                          search_query=search)
+                          search_query=search,
+                          member=member)
 
 @app.route('/courses/details/<int:course_id>')
 @login_required
@@ -416,7 +427,29 @@ def course_details(course_id):
         flash('Course not found.', 'error')
         return redirect(url_for('courses'))
     
-    return render_template('main/course-detail.html', course=course)
+    # ensure template has a 'member' object when a user is logged in
+    member = None
+    if session.get('member_id'):
+        try:
+            # db is available earlier in this view (or call get_db() if not)
+            mrow = db.execute('SELECT * FROM members WHERE id = ?', (session['member_id'],)).fetchone()
+            if mrow:
+                # convert row to dict for simpler manipulation in Python
+                member = dict(mrow) if hasattr(mrow, 'keys') else mrow
+
+                # resolve profile picture to a URL usable in templates
+                pic = member.get('profile_picture') if isinstance(member, dict) else None
+                if pic:
+                    if pic.startswith('http') or pic.startswith('/'):
+                        resolved = pic
+                    else:
+                        # local file stored under static/
+                        resolved = url_for('static', filename=pic)
+                    member['profile_picture'] = resolved
+        except Exception:
+            member = None
+
+    return render_template('main/course-detail.html', course=course, member=member)
 
 @app.route('/announcements')
 def announcements():
@@ -582,7 +615,6 @@ def admin_dashboard():
     
     recent_members_rows = db.execute('SELECT * FROM members ORDER BY created_at DESC LIMIT 5').fetchall()
     recent_courses_rows = db.execute('SELECT * FROM courses ORDER BY created_at DESC LIMIT 5').fetchall()
-    # normalize lists
     recent_members = []
     for r in recent_members_rows:
         d = row_to_dict(r)
@@ -620,7 +652,7 @@ def admin_members():
     
     query += ' ORDER BY created_at DESC'
     rows = db.execute(query, params).fetchall()
-    # convert rows -> dicts and resolve profile images
+    
     members = []
     for r in rows:
         d = row_to_dict(r)
@@ -735,12 +767,11 @@ def edit_members(member_id):
             update_fields.append('status = ?')
             params.append(status)
         
-        # checkbox now named "reset_password" in template (value '1' when checked)
+        
         reset_password = request.form.get('reset_password')
         new_password = request.form.get('new_password')
         confirm_password = request.form.get('confirm_password')
         
-        # handle password reset explicitly and validate
         if reset_password:
             if not new_password:
                 flash("New password is required to reset member's password.", 'error')
@@ -830,7 +861,7 @@ def admin_courses():
     
     query += ' ORDER BY created_at DESC'
     rows = db.execute(query, params).fetchall()
-    # convert rows -> dicts and resolve thumbnails
+    
     courses_list = []
     for r in rows:
         d = row_to_dict(r)
@@ -995,7 +1026,7 @@ def delete_course(course_id):
         delete_file(thumbnail)
     
     course_material = course['course_material']
-    # course_material may be a URL or a local stored path; delete only if it's a stored /static/... path
+    
     if course_material and str(course_material).startswith('/' + app.config['UPLOAD_FOLDER'].split(os.sep)[0]):
         delete_file(course_material)
     
@@ -1013,14 +1044,14 @@ def view_course(course_id):
     course_row = db.execute('SELECT * FROM courses WHERE id = ?', (course_id,)).fetchone()
     course = row_to_dict(course_row)
     if course:
-        # resolve thumbnail and material links if stored as filenames
+        
         course['thumbnail'] = resolve_media_path(course.get('thumbnail'))
         course['course_material'] = resolve_media_path(course.get('course_material'))
-        # course_video may be a full URL; leave as-is if it's http, otherwise resolve
+        
         cv = course.get('course_video')
         if cv and not str(cv).startswith('http'):
             course['course_video'] = resolve_media_path(cv)
-        # ensure keys exist
+        
         course.setdefault('title', '')
         course.setdefault('created_at', None)
     return render_template('admin/view_course.html', course=course)
@@ -1053,14 +1084,13 @@ def admin_announcements():
 def view_announcement(announcement_id):
     db = get_db()
     announcement_row = db.execute('SELECT * FROM announcements WHERE id = ?', (announcement_id,)).fetchone()
-    announcement = row_to_dict(announcement_row)  # convert row -> dict
-
-    # normalize poster (so template can directly use the resolved URL)
+    announcement = row_to_dict(announcement_row)  
+    
     if announcement:
         announcement['poster'] = resolve_media_path(announcement.get('poster'))
-        # populate author_name if available via join (optional)
+        
         if 'author_name' not in announcement:
-            # try to fetch author name
+            
             author = db.execute('SELECT full_name FROM admins WHERE id = ?', (announcement.get('author_id'),)).fetchone()
             announcement['author_name'] = author['full_name'] if author else None
         announcement.setdefault('created_at', None)
@@ -1110,7 +1140,7 @@ def edit_announcement(announcement_id):
         poster_file = request.files.get('poster')
         poster_path = None
 
-        # only attempt save if a file was provided
+        
         if poster_file and getattr(poster_file, 'filename', None):
             poster_path = save_file(poster_file, 'image')
 
@@ -1119,7 +1149,7 @@ def edit_announcement(announcement_id):
             return redirect(url_for('edit_announcement', announcement_id=announcement_id))
 
         if poster_path:
-            # delete previous poster if present
+            
             try:
                 old_poster = announcement['poster']
             except Exception:
@@ -1156,7 +1186,7 @@ def delete_announcement(announcement_id):
         flash('Announcement not found.', 'error')
         return redirect(url_for('admin_announcements'))
     
-    # delete poster file if present
+    
     poster = announcement['poster'] if 'poster' in announcement.keys() else None
     if poster:
         delete_file(poster)
@@ -1417,7 +1447,50 @@ def admin_logout():
     flash('Admin logged out successfully.', 'info')
     return redirect(url_for('admin_login'))
 
+@app.route('/delete-account', methods=['GET', 'POST'])
+def delete_account():
+    # Require a logged-in member (adjust if you want admins to delete members)
+    if not session.get('member_id'):
+        flash('You must be logged in to delete your account.', 'error')
+        return redirect(url_for('login'))
 
+    db = get_db()
+    member_id = session.get('member_id')
+
+    if request.method == 'POST':
+        try:
+            # perform deletion
+            db.execute('DELETE FROM members WHERE id = ?', (member_id,))
+            db.commit()
+        except Exception as e:
+            # log if you have logging configured; keep message generic for users
+            flash('An error occurred while deleting your account. Please contact support.', 'error')
+            return redirect(url_for('profile'))
+
+        # Clear session and redirect to public home
+        session.clear()
+        flash('Your account has been deleted. Goodbye.', 'success')
+        return redirect(url_for('index'))
+
+    # GET: show a minimal confirmation form (POST required to delete)
+    confirm_html = """
+    <!doctype html>
+    <html>
+      <head><meta charset="utf-8"><title>Confirm Account Deletion</title></head>
+      <body style="font-family:system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; padding:24px;">
+        <h2>Confirm Account Deletion</h2>
+        <p>This action is irreversible. To permanently delete your account, click the button below.</p>
+        <form method="post" action="{{ url_for('delete_account') }}">
+          <button type="submit" style="background:#dc3545;color:#fff;border:none;padding:10px 14px;border-radius:6px;cursor:pointer;">
+            Permanently delete my account
+          </button>
+          <a href="{{ url_for('profile') }}" style="margin-left:12px;">Cancel</a>
+        </form>
+        <p style="margin-top:18px;color:#6b7280;font-size:0.9rem;">Note: You must be signed in to delete your account.</p>
+      </body>
+    </html>
+    """
+    return render_template_string(confirm_html)
 
 # ==================== ERROR HANDLERS ====================
 
@@ -1437,4 +1510,4 @@ def internal_error(error):
 ensure_instance_path()
 if __name__ == "__main__":
     init_db()
-    app.run(debug=False, port=3000, host='0.0.0.0')
+    app.run(debug=True, port=3000, host='0.0.0.0')

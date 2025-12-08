@@ -4,233 +4,302 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - IT Club</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <style>
-        /* Simple Coming Soon Page CSS */
-:root {
-    --primary-color: #6366f1;
-    --secondary-color: #8b5cf6;
-    --dark-color: #0f172a;
-}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
 
-.coming-soon-page {
-    min-height: 100vh;
-    background: linear-gradient(135deg, var(--dark-color) 0%, #0f172a 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    position: relative;
-    overflow: hidden;
-}
-
-.coming-soon-page::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-        radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
-    pointer-events: none;
-}
-
-.coming-soon-container {
-    text-align: center;
-    max-width: 600px;
-    position: relative;
-    z-index: 1;
-    margin: 0 auto;
-}
-
-.dashboard-icon {
-    width: 120px;
-    height: 120px;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 2rem;
-    color: white;
-    font-size: 3.5rem;
-    box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-}
-
-.coming-soon-title {
-    color: #f8fafc;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    font-size: 3rem;
-    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-align: center;
-}
-
-.coming-soon-subtitle {
-    color: #94a3b8;
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-    line-height: 1.6;
-    text-align: center;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.back-btn {
-    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-    border: none;
-    color: white;
-    padding: 0.875rem 2rem;
-    font-weight: 600;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    margin-top: 1rem;
-    justify-content: center;
-}
-
-.back-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
-    color: white;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .coming-soon-title {
-        font-size: 2.5rem;
-    }
-    
-    .dashboard-icon {
-        width: 100px;
-        height: 100px;
-        font-size: 2.5rem;
-    }
-    
-    .coming-soon-subtitle {
-        font-size: 1.1rem;
-        padding: 0 1rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .coming-soon-page {
-        padding: 1rem;
-    }
-    
-    .coming-soon-title {
-        font-size: 2rem;
-    }
-    
-    .coming-soon-subtitle {
-        font-size: 1rem;
-    }
-    
-    .dashboard-icon {
-        width: 80px;
-        height: 80px;
-        font-size: 2rem;
-    }
-    
-    .back-btn {
-        padding: 0.75rem 1.5rem;
-        font-size: 0.95rem;
-    }
-}
-    </style>
 </head>
 <body>
-
-    <!-- Coming Soon Page -->
-    <div class="coming-soon-page">
-        <div class="container">
-            <div class="coming-soon-container">
-                <div class="dashboard-icon">
-                    <i class="fas fa-tachometer-alt"></i>
-                </div>
-                
-                <h1 class="coming-soon-title">Dashboard Coming Soon</h1>
-                
-                <p class="coming-soon-subtitle">
-                    We're building an amazing dashboard experience for IT Club members. 
-                    Get ready for personalized tracking, progress monitoring, and exclusive member features.
-                </p>
-                
-                <a href="/home" class="back-btn">
-                    <i class="fas fa-arrow-left"></i>
-                    Back to Homepage
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('home') }}" class="sidebar-brand">
+                    <i class="fas fa-laptop-code"></i>
+                    <span>IT Club</span>
                 </a>
             </div>
+            
+            <div class="sidebar-menu">
+                <a href="{{ url_for('dashboard') }}" class="menu-item active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('courses') }}" class="menu-item">
+                    <i class="fas fa-book-open"></i>
+                    <span>Courses</span>
+                </a>
+                <a href="{{ url_for('profile') }}" class="menu-item">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                
+                <div class="menu-divider"></div>
+                
+                <a href="{{ url_for('profile_update') }}" class="menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="menu-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <button class="hamburger-btn" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <h1 class="h4 mb-0 text-gradient">Dashboard</h1>
+                
+                <div class="user-profile">
+                    {% if member.profile_picture %}
+                    <img src="{{ member.profile_picture }}" alt="Profile" class="user-avatar">
+                    {% else %}
+                    <div class="user-avatar bg-primary d-flex align-items-center justify-content-center">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                    {% endif %}
+                    <span class="text-white">{{ member.full_name }}</span>
+                </div>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert-custom alert-{{ category }} fade-in mb-4">
+                            <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %} me-2"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon bg-primary">
+            <i class="fas fa-book-open"></i>
         </div>
+        <h3 class="stat-number">{{ courses|length }}</h3>
+        <p class="stat-label">Available Courses</p>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, var(--accent-color), #34d399);">
+            <i class="fas fa-bullhorn"></i>
+        </div>
+        <h3 class="stat-number">{{ announcements|length }}</h3>
+        <p class="stat-label">Announcements</p>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, var(--terminal-pink), #ec4899);">
+            <i class="fas fa-calendar-check"></i>
+        </div>
+        <h3 class="stat-number">
+            {% if member.last_login %}
+                Active
+            {% else %}
+                New
+            {% endif %}
+        </h3>
+        <p class="stat-label">Account Status</p>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, var(--terminal-yellow), #f59e0b);">
+            <i class="fas fa-user-check"></i>
+        </div>
+        <h3 class="stat-number">{{ member.created_at[:10] }}</h3>
+        <p class="stat-label">Joined Date</p>
+    </div>
+</div>
+
+            <!-- Content Row -->
+            <div class="row">
+                <!-- Left Column -->
+                <div class="col-lg-8">
+                    <!-- Recent Courses -->
+                    <div class="card-custom mb-4">
+                        <div class="card-header-custom">
+                            <h5 class="card-title">
+                                <i class="fas fa-book me-2 text-primary"></i>
+                                Recent Courses
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if courses %}
+                            <div class="row">
+                                {% for course in courses %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="course-card card-custom">
+                                        {% if course.thumbnail %}
+                                        <img src="{{ course.thumbnail }}" class="course-thumbnail" alt="{{ course.title }}">
+                                        {% else %}
+                                        <div class="course-thumbnail bg-dark d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-graduation-cap fa-3x text-primary"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <span class="course-category">{{ course.category or 'General' }}</span>
+                                            <h6 class="mt-2 mb-1 text-white">{{ course.title }}</h6>
+                                            <p class="small text-secondary mb-2">
+                                                <i class="fas fa-user-tie me-1"></i> {{ course.teacher or 'Instructor' }}
+                                            </p>
+                                            <div class="course-progress">
+                                                <div class="progress-bar-custom" style="width: 0%"></div>
+                                            </div>
+                                            <div class="d-flex justify-content-between mt-2">
+                                                <span class="small text-secondary">0% complete</span>
+                                                <a href="{{ url_for('course_details', course_id=course.id) }}" class="btn btn-sm btn-primary-custom">
+                                                    Continue
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-book-open fa-3x text-secondary mb-3"></i>
+                                <p class="text-secondary">No courses available yet.</p>
+                                <a href="{{ url_for('courses') }}" class="btn btn-primary-custom">
+                                    <i class="fas fa-search me-2"></i> Browse Courses
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+<!-- Announcements -->
+<div class="card-custom">
+    <div class="card-header-custom d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-bullhorn me-2 text-primary"></i>
+            Latest Announcements
+        </h5>
+        <a href="#announcements" class="btn btn-sm btn-outline-custom">
+            <i class="fas fa-eye me-1"></i> View All
+        </a>
+    </div>
+    <div class="card-body">
+        {% if announcements %}
+        <div class="row">
+            {% for announcement in announcements %}
+            <div class="col-md-6 mb-3">
+                <div class="announcement-card card-custom h-100">
+                    {% if announcement.poster %}
+                    <img src="{{ announcement.poster }}" 
+                         class="announcement-thumbnail" 
+                         alt="{{ announcement.title }}"
+                         onerror="this.style.display='none';">
+                    {% endif %}
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="text-white mb-1">{{ announcement.title }}</h6>
+                            <small class="text-secondary">{{ announcement.created_at[:10] }}</small>
+                        </div>
+                        
+                        <p class="text-secondary small mb-3 announcement-content">
+                            {{ announcement.content[:120] }}
+                            {% if announcement.content|length > 120 %}...{% endif %}
+                        </p>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-primary">
+                                    <i class="fas fa-user me-1"></i>
+                                    {{ announcement.author_name or 'IT Club Admin' }}
+                                </small>
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                {% if announcement.is_public == 1 %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-globe me-1"></i> Public
+                                </span>
+                                {% else %}
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-lock me-1"></i> Private
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-bullhorn fa-3x text-secondary mb-3"></i>
+            <h5 class="text-white mb-2">No Announcements Yet</h5>
+            <p class="text-secondary mb-0">Check back later for updates from IT Club.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+                </div>
+
+                <!-- Right Column -->
+
+            </div>
+        </main>
     </div>
 
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Countdown Timer
-        function updateCountdown() {
-            // Set launch date (3 months from now)
-            const launchDate = new Date();
-            launchDate.setMonth(launchDate.getMonth() + 3);
+        // Sidebar toggle for mobile
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('show');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const hamburger = document.getElementById('sidebarToggle');
             
-            const now = new Date().getTime();
-            const distance = launchDate - now;
-            
-            if (distance < 0) {
-                // Launch date passed
-                document.getElementById('days').innerHTML = '00';
-                document.getElementById('hours').innerHTML = '00';
-                document.getElementById('minutes').innerHTML = '00';
-                document.getElementById('seconds').innerHTML = '00';
-                return;
+            if (window.innerWidth <= 992) {
+                if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
+                    sidebar.classList.remove('show');
+                }
             }
-            
-            // Calculate time units
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            
-            // Update display
-            document.getElementById('days').innerHTML = days.toString().padStart(2, '0');
-            document.getElementById('hours').innerHTML = hours.toString().padStart(2, '0');
-            document.getElementById('minutes').innerHTML = minutes.toString().padStart(2, '0');
-            document.getElementById('seconds').innerHTML = seconds.toString().padStart(2, '0');
+        });
+
+        function animateValue(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                element.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
         }
-        
-        // Initialize countdown
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
-        
-        // Progress bar animation
+
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            const progressBar = document.querySelector('.progress-bar');
-            setTimeout(() => {
-                progressBar.style.transition = 'width 2s ease-in-out';
-                progressBar.style.width = '65%';
-            }, 500);
+            updateStats();
+            
+            // Animate progress bars
+            const progressBars = document.querySelectorAll('.progress-bar-custom');
+            progressBars.forEach(bar => {
+                const width = Math.floor(Math.random() * 100) + '%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 500);
+            });
         });
     </script>
 </body>

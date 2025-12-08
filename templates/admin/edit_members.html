@@ -297,11 +297,11 @@
                   <label class="form-label">Department</label>
                   <select class="form-select" name="department">
                     <option value="" {% if not member.department %}selected{% endif %}>Select Department</option>
-                    <option value="CSIT" {% if member.department == 'CSIT' %}selected{% endif %}>Cyber Security</option>
-                    <option value="BCA" {% if member.department == 'BCA' %}selected{% endif %}>Development</option>
-                    <option value="BSc IT" {% if member.department == 'BSc IT' %}selected{% endif %}>Data Science & Algorithm</option>
-                    <option value="MCA" {% if member.department == 'MCA' %}selected{% endif %}>AI & Robotics</option>
-                    <option value="Other" {% if member.department == 'Other' %}selected{% endif %}>Tech Research</option>
+                    <option value="Cybersecurity" {% if member.department == 'Cybersecurity' %}selected{% endif %}>Cyber Security</option>
+                    <option value="Development" {% if member.department == 'Development' %}selected{% endif %}>Development</option>
+                    <option value="Data Science & Algorithm" {% if member.department == 'Data Science & Algorithm' %}selected{% endif %}>Data Science & Algorithm</option>
+                    <option value="AI & Robotics" {% if member.department == 'AI & Robotics' %}selected{% endif %}>AI & Robotics</option>
+                    <option value="Tech Research" {% if member.department == 'Tech Research' %}selected{% endif %}>Tech Research</option>
                   </select>
                 </div>
 

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - IT Club</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('home') }}" class="sidebar-brand">
+                    <i class="fas fa-laptop-code"></i>
+                    <span>IT Club</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a href="{{ url_for('dashboard') }}" class="menu-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('courses') }}" class="menu-item">
+                    <i class="fas fa-book-open"></i>
+                    <span>Courses</span>
+                </a>
+                <a href="{{ url_for('profile') }}" class="menu-item active">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                
+                <div class="menu-divider"></div>
+                
+                <a href="{{ url_for('profile_update') }}" class="menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="menu-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+            
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <button class="hamburger-btn" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <h1 class="h4 mb-0 text-gradient">
+                    <i class="fas fa-user-circle me-2"></i>
+                    Profile
+                </h1>
+                
+                <div class="user-profile">
+                    {% if member.profile_picture %}
+                    <img src="{{ member.profile_picture }}" alt="Profile" class="user-avatar">
+                    {% else %}
+                    <div class="user-avatar bg-primary d-flex align-items-center justify-content-center">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                    {% endif %}
+                    <span class="text-white">{{ member.full_name }}</span>
+                </div>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert-custom alert-{{ category }} fade-in mb-4">
+                            <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %} me-2"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Profile Header -->
+<!-- Profile Header -->
+<div class="card-custom mb-4 profile-card">
+    <div class="profile-cover"></div>
+    
+    <div class="profile-info-container">
+        <div class="profile-avatar-left">
+            {% if member.profile_picture %}
+            <img src="{{ member.profile_picture }}" alt="Profile" class="profile-avatar-large">
+            {% else %}
+            <div class="avatar-placeholder-large">
+                <i class="fas fa-user fa-3x text-white"></i>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="profile-info-left">
+            <h2 class="text-white mb-2">{{ member.full_name }}</h2>
+            <p class="text-secondary mb-4">
+                <i class="fas fa-envelope me-2"></i>
+                {{ member.email }}
+            </p>
+            
+            <div class="d-flex gap-3 mb-4">
+                <span class="badge bg-primary">
+                    <i class="fas fa-circle me-1"></i>
+                    {{ member.status|capitalize }}
+                </span>
+                <span class="badge bg-secondary">
+                    <i class="fas fa-calendar me-1"></i>
+                    Joined {{ member.created_at[:10] }}
+                </span>
+            </div>
+            
+            <a href="{{ url_for('profile_update') }}" class="btn btn-primary-custom">
+                <i class="fas fa-edit me-2"></i>
+                Edit Profile
+            </a>
+        </div>
+    </div>
+</div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sidebar toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('show');
+        });
+
+        // Animate stats counters
+        document.addEventListener('DOMContentLoaded', function() {
+            const statsBadges = document.querySelectorAll('.stats-badge');
+            
+            statsBadges.forEach(badge => {
+                const currentValue = parseInt(badge.textContent);
+                if (!isNaN(currentValue)) {
+                    animateCounter(badge, currentValue);
+                }
+            });
+        });
+
+        function animateCounter(element, target) {
+            let current = 0;
+            const increment = target / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = target + (element.textContent.includes('%') ? '%' : '');
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current) + (element.textContent.includes('%') ? '%' : '');
+                }
+            }, 30);
+        }
+    </script>
+</body></html>

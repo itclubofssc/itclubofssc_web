@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ course.title }} - IT Club</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
+    <style>
+        /* Course Detail Specific Styles */
+        .course-hero {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1));
+            border-radius: 16px;
+            padding: 2.5rem;
+            border: 1px solid var(--border-medium);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .course-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            z-index: 0;
+        }
+        
+        .course-thumbnail-lg {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .thumbnail-placeholder {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, var(--dark-color), var(--card-bg));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .course-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        
+        .course-meta-item i {
+            color: var(--primary-color);
+            width: 20px;
+            font-size: 1rem;
+        }
+        
+        .nav-tabs-custom {
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 0;
+        }
+        
+        .nav-tabs-custom .nav-link {
+            color: var(--text-secondary);
+            border: 1px solid transparent;
+            border-radius: 12px 12px 0 0;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs-custom .nav-link:hover {
+            border-color: var(--border-medium);
+            color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.05);
+        }
+        
+        .nav-tabs-custom .nav-link.active {
+            background-color: var(--card-bg);
+            border-color: var(--border-light);
+            border-bottom-color: var(--card-bg);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-top: none;
+            border-radius: 0 0 16px 16px;
+            padding: 2rem;
+            min-height: 400px;
+        }
+        
+        .resource-item {
+            padding: 1.25rem;
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(15, 23, 42, 0.5);
+        }
+        
+        .resource-item:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(99, 102, 241, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 16px;
+            background: var(--darker-color);
+            border: 1px solid var(--border-light);
+        }
+        
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+        }
+        
+        .no-video {
+            background-color: rgba(30, 41, 59, 0.5);
+            border-radius: 16px;
+            padding: 4rem 2rem;
+            text-align: center;
+            border: 2px dashed var(--border-medium);
+        }
+        
+        .file-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .pdf-badge {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        .doc-badge {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .zip-badge {
+            background-color: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+        
+        .link-badge {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .course-info-card {
+            padding: 1.5rem;
+            background-color: rgba(30, 41, 59, 0.7);
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .info-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        
+        .info-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .empty-content {
+            padding: 3rem 2rem;
+            text-align: center;
+            background-color: rgba(30, 41, 59, 0.3);
+            border-radius: 12px;
+            border: 2px dashed var(--border-medium);
+        }
+        
+        .course-description {
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+        
+        .course-description p {
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Material download styles */
+        .material-download {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: rgba(99, 102, 241, 0.05);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            margin-bottom: 1rem;
+        }
+        
+        .material-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .material-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .material-details h6 {
+            margin-bottom: 0.25rem;
+        }
+        
+        .material-details p {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('home') }}" class="sidebar-brand">
+                    <i class="fas fa-laptop-code"></i>
+                    <span>IT Club</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a href="{{ url_for('dashboard') }}" class="menu-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('courses') }}" class="menu-item active">
+                    <i class="fas fa-book-open"></i>
+                    <span>Courses</span>
+                </a>
+                <a href="{{ url_for('profile') }}" class="menu-item">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                
+                <div class="menu-divider"></div>
+                
+                <a href="{{ url_for('profile_update') }}" class="menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="menu-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <button class="hamburger-btn" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item">
+                            <a href="{{ url_for('dashboard') }}" class="text-secondary text-decoration-none">
+                                <i class="fas fa-home"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{ url_for('courses') }}" class="text-secondary text-decoration-none">Courses</a>
+                        </li>
+                        <li class="breadcrumb-item active text-primary" aria-current="page">
+                            {{ course.title[:20] }}{% if course.title|length > 20 %}...{% endif %}
+                        </li>
+                    </ol>
+                </nav>
+                
+                <div class="user-profile">
+                    {% if member.profile_picture %}
+                    <img src="{{ member.profile_picture }}" alt="Profile" class="user-avatar">
+                    {% else %}
+                    <div class="user-avatar bg-primary d-flex align-items-center justify-content-center">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                    {% endif %}
+                    <span class="text-white">{{ member.full_name }}</span>
+                </div>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert-custom alert-{{ category }} fade-in mb-4">
+                            <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %} me-2"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Course Hero Section -->
+            <div class="course-hero">
+                <div class="row align-items-center">
+                    <div class="col-lg-4 mb-4 mb-lg-0">
+                        {% if course.thumbnail %}
+                        <img src="{{ course.thumbnail }}" alt="{{ course.title }}" class="course-thumbnail-lg">
+                        {% else %}
+                        <div class="thumbnail-placeholder">
+                            <i class="fas fa-graduation-cap fa-4x text-primary"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-lg-8 position-relative" style="z-index: 1;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                {% if course.is_featured %}
+                                <span class="badge-custom badge-featured me-2">
+                                    <i class="fas fa-star me-1"></i> Featured
+                                </span>
+                                {% endif %}
+                                {% if course.status == 'active' %}
+                                <span class="badge-custom badge-active">Active</span>
+                                {% endif %}
+                                <span class="badge-custom" style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                                    <i class="fas fa-folder me-1"></i> {{ course.category or 'General' }}
+                                </span>
+                            </div>
+                            <a href="{{ url_for('courses') }}" class="btn btn-outline-custom">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Courses
+                            </a>
+                        </div>
+                        
+                        <h1 class="text-white mb-3">{{ course.title }}</h1>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="course-meta-item">
+                                    <i class="fas fa-user-tie"></i>
+                                    <div>
+                                        <small class="text-secondary d-block">Instructor</small>
+                                        <span class="text-white">{{ course.teacher or 'IT Club Instructor' }}</span>
+                                    </div>
+                                </div>
+                                <div class="course-meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <div>
+                                        <small class="text-secondary d-block">Duration</small>
+                                        <span class="text-white">{{ course.time or 'Self-paced' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="course-meta-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <div>
+                                        <small class="text-secondary d-block">Created</small>
+                                        <span class="text-white">{{ course.created_at[:10] if course.created_at else 'Recently' }}</span>
+                                    </div>
+                                </div>
+                                <div class="course-meta-item">
+                                    <i class="fas fa-chart-line"></i>
+                                    <div>
+                                        <small class="text-secondary d-block">Level</small>
+                                        <span class="text-white">All Levels</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 d-flex gap-3">
+                            {% if course.course_video %}
+                            <a href="#video" class="btn btn-primary-custom" onclick="showVideoTab()">
+                                <i class="fas fa-play-circle me-2"></i> Watch Course
+                            </a>
+                            {% endif %}
+                            
+                            {% if course.course_material %}
+                            <a href="#materials" class="btn btn-outline-custom" onclick="showMaterialsTab()">
+                                <i class="fas fa-download me-2"></i> Get Materials
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Content -->
+            <div class="row">
+                <!-- Main Content -->
+                <div class="col-lg-8 mb-4">
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs nav-tabs-custom" id="courseTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">
+                                <i class="fas fa-info-circle me-2"></i> Description
+                            </button>
+                        </li>
+                        {% if course.course_video %}
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="video-tab" data-bs-toggle="tab" data-bs-target="#video" type="button" role="tab">
+                                <i class="fas fa-video me-2"></i> Course Video
+                            </button>
+                        </li>
+                        {% endif %}
+                        {% if course.course_material %}
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="materials-tab" data-bs-toggle="tab" data-bs-target="#materials" type="button" role="tab">
+                                <i class="fas fa-file-alt me-2"></i> Materials
+                            </button>
+                        </li>
+                        {% endif %}
+                    </ul>
+                    
+                    <div class="tab-content" id="courseTabContent">
+                        <!-- Description Tab -->
+                        <div class="tab-pane fade show active" id="description" role="tabpanel">
+                            <div class="course-description">
+                                {% if course.description %}
+                                    {% if course.description.startswith('<') %}
+                                        {{ course.description|safe }}
+                                    {% else %}
+                                        <p>{{ course.description }}</p>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="empty-content">
+                                        <i class="fas fa-info-circle fa-3x text-secondary mb-3"></i>
+                                        <h4 class="text-white mb-3">No Description Available</h4>
+                                        <p class="text-secondary">
+                                            This course doesn't have a detailed description yet. Check back soon or contact the instructor for more information.
+                                        </p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Video Tab -->
+                        {% if course.course_video %}
+                        <div class="tab-pane fade" id="video" role="tabpanel">
+                            {% if course.course_video %}
+                                {% if 'youtube.com' in course.course_video or 'youtu.be' in course.course_video %}
+                                    {% set video_id = course.course_video.split('v=')[1].split('&')[0] if 'v=' in course.course_video else course.course_video.split('/')[-1] %}
+                                    <div class="video-container">
+                                        <iframe src="https://www.youtube.com/embed/{{ video_id }}" 
+                                                frameborder="0" 
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                allowfullscreen>
+                                        </iframe>
+                                    </div>
+                                {% elif course.course_video.startswith('http') %}
+                                    <div class="video-container">
+                                        <iframe src="{{ course.course_video }}" 
+                                                frameborder="0" 
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                allowfullscreen>
+                                        </iframe>
+                                    </div>
+                                {% else %}
+                                    <div class="video-container">
+                                        <video controls class="w-100 h-100">
+                                            <source src="{{ course.course_video }}" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                {% endif %}
+                                <div class="mt-4">
+                                    <h5 class="text-white mb-3">Video Instructions</h5>
+                                    <div class="alert alert-custom">
+                                        <i class="fas fa-lightbulb me-2 text-warning"></i>
+                                        <span class="text-secondary">
+                                            Watch the video carefully. You can pause, rewind, and adjust playback speed as needed.
+                                        </span>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="no-video">
+                                    <i class="fas fa-video-slash fa-4x text-secondary mb-4"></i>
+                                    <h4 class="text-white mb-3">No Video Available</h4>
+                                    <p class="text-secondary">
+                                        This course doesn't have a video component yet.
+                                    </p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Materials Tab -->
+                        {% if course.course_material %}
+                        <div class="tab-pane fade" id="materials" role="tabpanel">
+                            <h5 class="text-white mb-4">Course Materials</h5>
+                            
+                            {% if course.course_material %}
+                                <div class="material-download">
+                                    <div class="material-info">
+                                        {% if course.course_material.endswith('.pdf') %}
+                                            <div class="material-icon">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </div>
+                                        {% elif course.course_material.endswith('.doc') or course.course_material.endswith('.docx') %}
+                                            <div class="material-icon">
+                                                <i class="fas fa-file-word"></i>
+                                            </div>
+                                        {% elif course.course_material.endswith('.zip') or course.course_material.endswith('.rar') %}
+                                            <div class="material-icon">
+                                                <i class="fas fa-file-archive"></i>
+                                            </div>
+                                        {% elif course.course_material.startswith('http') %}
+                                            <div class="material-icon">
+                                                <i class="fas fa-external-link-alt"></i>
+                                            </div>
+                                        {% else %}
+                                            <div class="material-icon">
+                                                <i class="fas fa-file"></i>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        <div class="material-details">
+                                            <h6 class="text-white mb-1">Course Materials</h6>
+                                            <p class="text-secondary">
+                                                {% if course.course_material.startswith('http') %}
+                                                    External link to course resources
+                                                {% else %}
+                                                    Download course materials
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if course.course_material.startswith('http') %}
+                                        <a href="{{ course.course_material }}" target="_blank" class="btn btn-primary-custom">
+                                            <i class="fas fa-external-link-alt me-2"></i> Open Link
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ course.course_material }}" download class="btn btn-primary-custom">
+                                            <i class="fas fa-download me-2"></i> Download
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="empty-content">
+                                    <i class="fas fa-file-alt fa-3x text-secondary mb-3"></i>
+                                    <h4 class="text-white mb-3">No Materials Available</h4>
+                                    <p class="text-secondary">
+                                        This course doesn't have any downloadable materials yet. Check back soon!
+                                    </p>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Additional resources -->
+                            <div class="mt-4">
+                                <h6 class="text-white mb-3">Additional Resources</h6>
+                                <div class="alert alert-custom">
+                                    <i class="fas fa-book-open me-2 text-primary"></i>
+                                    <span class="text-secondary">
+                                        For additional learning resources, visit our 
+                                        <a href="{{ url_for('courses') }}" class="text-primary text-decoration-none">courses page</a> 
+                                        or check the announcements section for updates.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Sidebar - Course Information -->
+                <div class="col-lg-4">
+                    <!-- Course Info Card -->
+                    <div class="course-info-card">
+                        <h5 class="text-white mb-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Course Details
+                        </h5>
+                        <div class="info-grid mb-3">
+                            <div class="info-item">
+                                <span class="info-label">Category</span>
+                                <span class="info-value">{{ course.category or 'General' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Instructor</span>
+                                <span class="info-value">{{ course.teacher or 'IT Club' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Duration</span>
+                                <span class="info-value">{{ course.time or 'Self-paced' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Created</span>
+                                <span class="info-value">{{ course.created_at[:10] if course.created_at else 'Recently' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Status</span>
+                                <span class="info-value">
+                                    {% if course.status == 'active' %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ course.status|capitalize }}</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Access</span>
+                                <span class="info-value">Members Only</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6 class="text-white mb-2">Course Includes</h6>
+                            <ul class="list-unstyled">
+                                {% if course.course_video %}
+                                <li class="text-secondary mb-1">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Video content
+                                </li>
+                                {% endif %}
+                                {% if course.course_material %}
+                                <li class="text-secondary mb-1">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Downloadable materials
+                                </li>
+                                {% endif %}
+                                <li class="text-secondary mb-1">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Detailed description
+                                </li>
+                                <li class="text-secondary mb-1">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Instructor support
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-4 pt-3 border-top border-secondary">
+                            <a href="{{ url_for('courses') }}" class="btn btn-outline-custom w-100">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Back to All Courses
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sidebar toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('show');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const hamburger = document.getElementById('sidebarToggle');
+            
+            if (window.innerWidth <= 992) {
+                if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
+                    sidebar.classList.remove('show');
+                }
+            }
+        });
+
+        // Tab functionality
+        function showVideoTab() {
+            const videoTab = new bootstrap.Tab(document.getElementById('video-tab'));
+            videoTab.show();
+        }
+        
+        function showMaterialsTab() {
+            const materialsTab = new bootstrap.Tab(document.getElementById('materials-tab'));
+            materialsTab.show();
+        }
+        
+        // Auto-scroll to active section from URL hash
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.location.hash) {
+                const hash = window.location.hash.substring(1);
+                if (hash === 'video' || hash === 'materials') {
+                    const tab = new bootstrap.Tab(document.getElementById(`${hash}-tab`));
+                    tab.show();
+                }
+            }
+        });
+        
+        // Initialize Bootstrap tabs
+        const triggerTabList = [].slice.call(document.querySelectorAll('#courseTab button'));
+        triggerTabList.forEach(function (triggerEl) {
+            const tabTrigger = new bootstrap.Tab(triggerEl);
+            
+            triggerEl.addEventListener('click', function (event) {
+                event.preventDefault();
+                tabTrigger.show();
+            });
+        });
+    </script>
+</body>
+</html>
